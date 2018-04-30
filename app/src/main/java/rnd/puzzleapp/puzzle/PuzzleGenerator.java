@@ -1,5 +1,9 @@
 package rnd.puzzleapp.puzzle;
 
 public interface PuzzleGenerator {
-    Puzzle generate();
+    default Puzzle generate() {
+        return generate(true);
+    }
+
+    Puzzle generate(boolean keepBridges);
 }

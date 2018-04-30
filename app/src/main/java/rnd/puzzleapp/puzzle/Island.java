@@ -25,6 +25,10 @@ public class Island {
         return requiredBridges;
     }
 
+    public boolean crosses(Bridge bridge) {
+        return bridge.crosses(this);
+    }
+
     @Override
     public int hashCode() {
         return x ^ y ^ requiredBridges;

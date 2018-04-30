@@ -95,8 +95,8 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
         Bridge newEdge = new Bridge(node, newNode);
 
         if(!puzzle.getIslands().contains(newNode)
+                && puzzle.getBridges().stream().noneMatch(newNode::crosses)
                 && puzzle.getBridges().stream().noneMatch(newEdge::intersects)
-                //&& puzzle.getBridges().stream().noneMatch(e -> e.crosses(newNode))
                 && puzzle.getIslands().stream().noneMatch(newEdge::crosses)) {
             puzzle.getIslands().add(newNode);
             puzzle.getBridges().add(newEdge);
@@ -115,8 +115,26 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
         }
     }
 
+    private Island normalizeNode(Island node, int minX, int minY) {
+        return new Island(node.getX() - minX, node.getY() - minY, node.getRequiredBridges());
+    }
+
+    private Island findNormalizedNode(Island node, List<Island> normalizedNodes, int minX, int minY) {
+        return normalizedNodes.stream()
+                .filter(i -> i.getX() + minX == node.getX() && i.getY() + minY == node.getY())
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Bridge normalizeEdge(Bridge edge, List<Island> nodes, int minX, int minY) {
+        Island firstEndpoint = findNormalizedNode(edge.getFirstEndpoint(), nodes, minX, minY);
+        Island secondEndpoint = findNormalizedNode(edge.getSecondEndpoint(), nodes, minX, minY);
+
+        return new Bridge(firstEndpoint, secondEndpoint);
+    }
+
     @Override
-    public Puzzle generate() {
+    public Puzzle generate(boolean keepBridges) {
         // Add 2 initial connected nodes.
         Island initialNode = new Island(0, 0, 0);
         puzzle.getIslands().add(initialNode);
@@ -137,7 +155,10 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
         int minY = nodes.stream().map(Island::getY).min(Integer::compare).get();
 
         List<Island> normalizedNodes = nodes.stream()
-                .map(i -> new Island(i.getX() - minX, i.getY() - minY, i.getRequiredBridges()))
+                .map(i -> normalizeNode(i, minX, minY))
+                .collect(Collectors.toList());
+        List<Bridge> normalizedEdges = puzzle.getBridges().stream()
+                .map(b -> normalizeEdge(b, normalizedNodes, minX, minY))
                 .collect(Collectors.toList());
 
         // Remove existing nodes and edges.
@@ -146,6 +167,9 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
 
         // Add the final normalized nodes to form the puzzle.
         puzzle.getIslands().addAll(normalizedNodes);
+        if(keepBridges) {
+            puzzle.getBridges().addAll(normalizedEdges);
+        }
 
         return puzzle;
     }

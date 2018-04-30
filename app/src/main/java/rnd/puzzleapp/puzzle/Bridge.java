@@ -65,7 +65,10 @@ public class Bridge {
     }
 
     public boolean crosses(Island island) {
-        return getHorizontalSpan().contains(island.getX()) || getVerticalSpan().contains(island.getY());
+        return getHorizontalSpan().contains(island.getX()) && firstEndpoint.getY() == island.getY()
+                || getVerticalSpan().contains(island.getY()) && firstEndpoint.getX() == island.getX();
+
+        //return getHorizontalSpan().contains(island.getX()) && getVerticalSpan().contains(island.getY());
     }
 
     @Override

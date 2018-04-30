@@ -9,6 +9,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static rnd.puzzleapp.utils.Functional.doIf;
+
 public class Puzzle {
     // TODO: Online this rule is mentioned, but project description doesn't explicitly state this.
     public static final int MAX_BRIDGE_COUNT = 2;
@@ -22,7 +24,7 @@ public class Puzzle {
         this.bridges = new ArrayList<>();
     }
 
-    private Stream<Island> getNeighbors(Island island) {
+    public Stream<Island> getNeighbors(Island island) {
         return bridges.stream()
                 .filter(b -> b.hasEndpoint(island))
                 .map(b -> b.getOtherEndpoint(island))
@@ -73,23 +75,30 @@ public class Puzzle {
         return bridges.stream().filter(bridge::equals).count();
     }
 
-    public void placeBridge(Bridge bridge) {
-        bridges.add(bridge);
+    public boolean placeBridge(Bridge bridge) {
+        return doIf(canPlaceBridge(bridge), () -> bridges.add(bridge));
     }
 
-    public void deleteBridge(Bridge bridge) {
-        bridges.remove(bridge);
+    public boolean deleteBridge(Bridge bridge) {
+        return bridges.remove(bridge);
     }
 
     public boolean canPlaceBridge(Bridge bridge) {
         return bridge.isStraight()
-                && bridges.stream().noneMatch(bridge::intersects)
+                && bridges.stream().filter(bridge::equals).count() < MAX_BRIDGE_COUNT
                 && islands.stream().noneMatch(bridge::crosses)
-                && bridges.stream().filter(bridge::equals).count() < MAX_BRIDGE_COUNT;
+                && (bridges.stream().noneMatch(bridge::intersects)
+                || bridges.stream().anyMatch(bridge::equals));
     }
 
     public PuzzleStatus getStatus() {
         return bridges.isEmpty() ? PuzzleStatus.Untouched : getSolvedStatus();
+    }
+
+    public Optional<Bridge> getBridge(int x, int y) {
+        Island island = new Island(x, y, 0);
+
+        return bridges.stream().filter(b -> b.crosses(island)).findFirst();
     }
 
     public Optional<Island> getIsland(int x, int y) {
