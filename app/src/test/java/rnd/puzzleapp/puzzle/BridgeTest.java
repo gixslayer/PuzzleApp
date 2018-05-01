@@ -5,7 +5,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +31,8 @@ public class BridgeTest {
                 if(n1 == n2) continue;
                 if(n1.getX() != n2.getX() && n1.getY() != n2.getY()) continue;
 
-                edges.add(new Bridge(n1, n2));
+                //edges.add(new Bridge(n1, n2));
+                edges.add(Bridge.create(n1, n2));
             }
         }
     }

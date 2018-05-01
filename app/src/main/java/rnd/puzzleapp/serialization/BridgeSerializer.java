@@ -38,7 +38,7 @@ public class BridgeSerializer implements Serializer<Bridge> {
             Island secondEndPoint = puzzle.getIsland(x2, y2)
                     .orElseThrow(() -> new IOException("Invalid island location"));
 
-            return new Bridge(firstEndPoint, secondEndPoint);
+            return Bridge.create(firstEndPoint, secondEndPoint);
         } catch (Throwable e) {
             throw new IOException(e);
         }

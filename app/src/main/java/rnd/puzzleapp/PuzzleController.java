@@ -66,7 +66,7 @@ public class PuzzleController {
     }
 
     private void completeSelection(Island island) {
-        Bridge bridge = new Bridge(selectedIsland, island);
+        Bridge bridge = Bridge.create(selectedIsland, island);
 
         if(selectedMode == SelectionMode.delete && deleteBridge(bridge)) {
             clearSelection();

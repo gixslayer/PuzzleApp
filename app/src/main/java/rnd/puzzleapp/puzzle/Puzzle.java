@@ -1,17 +1,24 @@
 package rnd.puzzleapp.puzzle;
 
+import android.support.annotation.NonNull;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static rnd.puzzleapp.utils.Collections.addSorted;
+import static rnd.puzzleapp.utils.Collections.iteratorCompare;
+import static rnd.puzzleapp.utils.Functional.crossApply;
 import static rnd.puzzleapp.utils.Functional.doIf;
 
-public class Puzzle {
+public class Puzzle implements Comparable<Puzzle> {
     // TODO: Online this rule is mentioned, but project description doesn't explicitly state this.
     public static final int MAX_BRIDGE_COUNT = 2;
 
@@ -22,6 +29,21 @@ public class Puzzle {
         // TODO: Ensure a puzzle contains at least 2 islands.
         this.islands = new ArrayList<>();
         this.bridges = new ArrayList<>();
+    }
+
+    private Puzzle(Puzzle other) {
+        this.islands = other.islands.stream()
+                .sequential()
+                .map(Island::copy)
+                .collect(Collectors.toList());
+        this.bridges = other.bridges.stream()
+                .sequential()
+                .map(b -> b.copy(this))
+                .collect(Collectors.toList());
+    }
+
+    public Puzzle copy() {
+        return new Puzzle(this);
     }
 
     public Stream<Island> getNeighbors(Island island) {
@@ -76,7 +98,7 @@ public class Puzzle {
     }
 
     public boolean placeBridge(Bridge bridge) {
-        return doIf(canPlaceBridge(bridge), () -> bridges.add(bridge));
+        return doIf(canPlaceBridge(bridge), () -> addSorted(bridges, bridge));
     }
 
     public boolean deleteBridge(Bridge bridge) {
@@ -85,6 +107,7 @@ public class Puzzle {
 
     public boolean canPlaceBridge(Bridge bridge) {
         return bridge.isStraight()
+                && !bridge.getFirstEndpoint().equals(bridge.getSecondEndpoint())
                 && bridges.stream().filter(bridge::equals).count() < MAX_BRIDGE_COUNT
                 && islands.stream().noneMatch(bridge::crosses)
                 && (bridges.stream().noneMatch(bridge::intersects)
@@ -125,5 +148,30 @@ public class Puzzle {
 
     public List<Bridge> getBridges() {
         return bridges;
+    }
+
+    public Iterable<Bridge> getPossibleBridges() {
+        return crossApply(islands, Bridge::create)
+                .filter(this::canPlaceBridge)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Puzzle) {
+            Puzzle other = (Puzzle)obj;
+
+            return compareTo(other) == 0;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int compareTo(@NonNull Puzzle puzzle) {
+        // NOTE: Assumes both bridges and islands are sorted based on compareTo
+        int islandCompare = iteratorCompare(islands, puzzle.islands);
+
+        return islandCompare != 0 ? islandCompare : iteratorCompare(bridges, puzzle.bridges);
     }
 }

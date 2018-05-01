@@ -1,5 +1,6 @@
 package rnd.puzzleapp.puzzle;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -70,8 +71,8 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
 
             // Create and add subdivided node and edges.
             Island newNode = new Island(x, y, 0);
-            Bridge newEdge1 = new Bridge(edge.getFirstEndpoint(), newNode);
-            Bridge newEdge2 = new Bridge(edge.getSecondEndpoint(), newNode);
+            Bridge newEdge1 = Bridge.create(edge.getFirstEndpoint(), newNode);
+            Bridge newEdge2 = Bridge.create(edge.getSecondEndpoint(), newNode);
 
             puzzle.getIslands().add(newNode);
             for(int i = 0; i < edgeMultiplicity; ++i) {
@@ -92,7 +93,7 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
     private void nodeAddition() {
         Island node = selectRandomNode();
         Island newNode = randomOffset(node);
-        Bridge newEdge = new Bridge(node, newNode);
+        Bridge newEdge = Bridge.create(node, newNode);
 
         if(!puzzle.getIslands().contains(newNode)
                 && puzzle.getBridges().stream().noneMatch(newNode::crosses)
@@ -130,7 +131,7 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
         Island firstEndpoint = findNormalizedNode(edge.getFirstEndpoint(), nodes, minX, minY);
         Island secondEndpoint = findNormalizedNode(edge.getSecondEndpoint(), nodes, minX, minY);
 
-        return new Bridge(firstEndpoint, secondEndpoint);
+        return Bridge.create(firstEndpoint, secondEndpoint);
     }
 
     @Override
@@ -165,9 +166,13 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
         puzzle.getIslands().clear();
         puzzle.getBridges().clear();
 
-        // Add the final normalized nodes to form the puzzle.
+        // Add the final normalized & sorted nodes to form the puzzle.
+        Collections.sort(normalizedNodes);
         puzzle.getIslands().addAll(normalizedNodes);
+
+        // Add the final normalized & sorted edges to form a solution to the puzzle.
         if(keepBridges) {
+            Collections.sort(normalizedEdges);
             puzzle.getBridges().addAll(normalizedEdges);
         }
 
