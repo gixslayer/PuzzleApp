@@ -11,6 +11,8 @@ import rnd.puzzleapp.graphics.ThumbnailRenderer;
 import rnd.puzzleapp.puzzle.Puzzle;
 import rnd.puzzleapp.puzzle.PuzzleGenerator;
 import rnd.puzzleapp.puzzle.RandomPuzzleGenerator;
+import rnd.puzzleapp.storage.StorageManager;
+import rnd.puzzleapp.storage.StoredPuzzle;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,6 +35,11 @@ public class MainActivity extends AppCompatActivity {
         ImageView imageView = findViewById(R.id.thumbnail);
 
         imageView.setImageBitmap(thumbnail);
+
+        //Puzzle p = puzzle.copy();
+        //p.getBridges().clear();
+        //StorageManager.save(this, StoredPuzzle.create(String.format("puzzle_%d", seed - 1), p, puzzle, thumbnail));
+
     }
 
     public void clicked(View view) {
