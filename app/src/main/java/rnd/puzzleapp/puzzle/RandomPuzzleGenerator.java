@@ -71,8 +71,8 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
 
             // Create and add subdivided node and edges.
             Island newNode = new Island(x, y, 0);
-            Bridge newEdge1 = Bridge.create(edge.getFirstEndpoint(), newNode);
-            Bridge newEdge2 = Bridge.create(edge.getSecondEndpoint(), newNode);
+            Bridge newEdge1 = new Bridge(edge.getX1(), edge.getY1(), newNode.getX(), newNode.getY());
+            Bridge newEdge2 = new Bridge(newNode.getX(), newNode.getY(), edge.getX2(), edge.getY2());
 
             puzzle.getIslands().add(newNode);
             for(int i = 0; i < edgeMultiplicity; ++i) {
@@ -120,18 +120,8 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
         return new Island(node.getX() - minX, node.getY() - minY, node.getRequiredBridges());
     }
 
-    private Island findNormalizedNode(Island node, List<Island> normalizedNodes, int minX, int minY) {
-        return normalizedNodes.stream()
-                .filter(i -> i.getX() + minX == node.getX() && i.getY() + minY == node.getY())
-                .findFirst()
-                .orElse(null);
-    }
-
-    private Bridge normalizeEdge(Bridge edge, List<Island> nodes, int minX, int minY) {
-        Island firstEndpoint = findNormalizedNode(edge.getFirstEndpoint(), nodes, minX, minY);
-        Island secondEndpoint = findNormalizedNode(edge.getSecondEndpoint(), nodes, minX, minY);
-
-        return Bridge.create(firstEndpoint, secondEndpoint);
+    private Bridge normalizeEdge(Bridge edge, int minX, int minY) {
+        return new Bridge(edge.getX1() - minX, edge.getY1() - minY, edge.getX2() - minX, edge.getY2() - minY);
     }
 
     @Override
@@ -159,7 +149,7 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
                 .map(i -> normalizeNode(i, minX, minY))
                 .collect(Collectors.toList());
         List<Bridge> normalizedEdges = puzzle.getBridges().stream()
-                .map(b -> normalizeEdge(b, normalizedNodes, minX, minY))
+                .map(b -> normalizeEdge(b, minX, minY))
                 .collect(Collectors.toList());
 
         // Remove existing nodes and edges.

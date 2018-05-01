@@ -141,7 +141,7 @@ public class PuzzleRenderer {
 
     private void drawHorizontalBridge(Bridge bridge, float yOffset) {
         Span horizontalSpan = bridge.getHorizontalSpan();
-        float y = bridge.getFirstEndpoint().getY();
+        float y = bridge.getY1();
         float left = horizontalSpan.getStart() * CELL_SIZE + CELL_SIZE / 2;
         float top = y * CELL_SIZE + yOffset;
         float right = horizontalSpan.getEnd() * CELL_SIZE + CELL_SIZE / 2;
@@ -152,7 +152,7 @@ public class PuzzleRenderer {
 
     private void drawVerticalBridge(Bridge bridge, float xOffset) {
         Span verticalSpan = bridge.getVerticalSpan();
-        float x = bridge.getFirstEndpoint().getX();
+        float x = bridge.getX1();
         float left = x * CELL_SIZE + xOffset;
         float top = verticalSpan.getStart() * CELL_SIZE + CELL_SIZE / 2;
         float right = left + BRIDGE_WIDTH;

@@ -3,42 +3,53 @@ package rnd.puzzleapp.puzzle;
 import android.support.annotation.NonNull;
 
 import java.util.Locale;
-import java.util.Optional;
 
 public class Bridge implements Comparable<Bridge> {
-    private final Island firstEndpoint;
-    private final Island secondEndpoint;
+    private final int x1;
+    private final int y1;
+    private final int x2;
+    private final int y2;
 
-    private Bridge(Island firstEndpoint, Island secondEndpoint) {
-        this.firstEndpoint = firstEndpoint;
-        this.secondEndpoint = secondEndpoint;
+    public Bridge(int x1, int y1, int x2, int y2) {
+        this.x1 = x1;
+        this.y1 = y1;
+        this.x2 = x2;
+        this.y2 = y2;
     }
 
-    public Bridge copy(Puzzle puzzle) {
-        Optional<Island> first = puzzle.getIsland(firstEndpoint.getX(), firstEndpoint.getY());
-        Optional<Island> second = puzzle.getIsland(secondEndpoint.getX(), secondEndpoint.getY());
+    private Bridge(Bridge other) {
+        this.x1 = other.x1;
+        this.y1 = other.y1;
+        this.x2 = other.x2;
+        this.y2 = other.y2;
+    }
 
-        if(!first.isPresent() || !second.isPresent()) {
-            throw new IllegalArgumentException("Puzzle does not contain both endpoints");
-        }
-
-        return new Bridge(first.get(), second.get());
+    public Bridge copy() {
+        return new Bridge(this);
     }
 
     public boolean hasEndpoint(Island island) {
-        return firstEndpoint == island || secondEndpoint == island;
+        return hasEndpoint(island.getX(), island.getY());
     }
 
-    public Island getOtherEndpoint(Island island) {
-        return firstEndpoint == island ? secondEndpoint : firstEndpoint;
+    public boolean hasEndpoint(int x, int y) {
+        return (x1 == x && y1 == y) || (x2 == x && y2 == y);
     }
 
-    public Island getFirstEndpoint() {
-        return firstEndpoint;
+    public int getX1() {
+        return x1;
     }
 
-    public Island getSecondEndpoint() {
-        return secondEndpoint;
+    public int getY1() {
+        return y1;
+    }
+
+    public int getX2() {
+        return x2;
+    }
+
+    public int getY2() {
+        return y2;
     }
 
     public Orientation getOrientation() {
@@ -46,7 +57,7 @@ public class Bridge implements Comparable<Bridge> {
             throw new IllegalStateException("Bridge must be straight");
         }
 
-        return firstEndpoint.getX() == secondEndpoint.getX() ? Orientation.Vertical : Orientation.Horizontal;
+        return x1 == x2 ? Orientation.Vertical : Orientation.Horizontal;
     }
 
     public Span getHorizontalSpan() {
@@ -54,7 +65,7 @@ public class Bridge implements Comparable<Bridge> {
             throw new IllegalStateException("Bridge must be straight");
         }
 
-        return Span.fromValues(firstEndpoint.getX(), secondEndpoint.getX());
+        return Span.fromValues(x1, x2);
     }
 
     public Span getVerticalSpan() {
@@ -62,11 +73,15 @@ public class Bridge implements Comparable<Bridge> {
             throw new IllegalStateException("Bridge must be straight");
         }
 
-        return Span.fromValues(firstEndpoint.getY(), secondEndpoint.getY());
+        return Span.fromValues(y1, y2);
     }
 
     public boolean isStraight() {
-        return firstEndpoint.getX() == secondEndpoint.getX() ^ firstEndpoint.getY() == secondEndpoint.getY();
+        return x1 == x2 ^ y1 == y2;
+    }
+
+    public boolean isLoop() {
+        return x1 == x2 && y1 == y2;
     }
 
     public boolean intersects(Bridge bridge) {
@@ -79,8 +94,12 @@ public class Bridge implements Comparable<Bridge> {
     }
 
     public boolean crosses(Island island) {
-        return getHorizontalSpan().contains(island.getX()) && firstEndpoint.getY() == island.getY()
-                || getVerticalSpan().contains(island.getY()) && firstEndpoint.getX() == island.getX();
+        return getHorizontalSpan().contains(island.getX()) && y1 == island.getY()
+                || getVerticalSpan().contains(island.getY()) && x1 == island.getX();
+    }
+
+    public boolean crosses(int x, int y) {
+        return getHorizontalSpan().contains(x) && y1 == y || getVerticalSpan().contains(y) && x1 == x;
     }
 
     @Override
@@ -88,7 +107,7 @@ public class Bridge implements Comparable<Bridge> {
         if(obj instanceof Bridge) {
             Bridge other = (Bridge)obj;
 
-            return firstEndpoint.equals(other.firstEndpoint) && secondEndpoint.equals(other.secondEndpoint);
+            return x1 == other.x1 && y1 == other.y1 && x2 == other.x2 && y2 == other.y2;
         } else {
             return false;
         }
@@ -96,19 +115,32 @@ public class Bridge implements Comparable<Bridge> {
 
     @Override
     public int hashCode() {
-        return firstEndpoint.hashCode() ^ secondEndpoint.hashCode();
+        return x1 ^ y1 ^ x2 ^ y2;
     }
 
     @Override
     public String toString() {
-        return String.format(Locale.US, "%s - %s", firstEndpoint, secondEndpoint);
+        return String.format(Locale.US, "(%d,%d)-(%d,%d)", x1, y1, x2, y2);
     }
 
     @Override
     public int compareTo(@NonNull Bridge bridge) {
-        int compareFirst = firstEndpoint.compareTo(bridge.firstEndpoint);
+        int compareX1 = Integer.compare(x1, bridge.x1);
+        if(compareX1 != 0) {
+            return compareX1;
+        }
 
-        return compareFirst != 0 ? compareFirst : secondEndpoint.compareTo(bridge.secondEndpoint);
+        int compareY1 = Integer.compare(y1, bridge.y1);
+        if(compareY1 != 0) {
+            return compareY1;
+        }
+
+        int compareX2 = Integer.compare(x2, bridge.x2);
+        if(compareX2 != 0) {
+            return compareX2;
+        }
+
+        return Integer.compare(y2, bridge.y2);
     }
 
     public static Bridge create(Island endpointA, Island endpointB) {
@@ -116,6 +148,6 @@ public class Bridge implements Comparable<Bridge> {
         Island firstEndpoint = compare <= 0 ? endpointA : endpointB;
         Island secondEndpoint = compare > 0 ? endpointA : endpointB;
 
-        return new Bridge(firstEndpoint, secondEndpoint);
+        return new Bridge(firstEndpoint.getX(), firstEndpoint.getY(), secondEndpoint.getX(), secondEndpoint.getY());
     }
 }

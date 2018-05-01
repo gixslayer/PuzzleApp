@@ -8,6 +8,8 @@ import rnd.puzzleapp.puzzle.Bridge;
 import rnd.puzzleapp.puzzle.Island;
 import rnd.puzzleapp.puzzle.Puzzle;
 
+import static rnd.puzzleapp.utils.Functional.repeatN;
+
 public class PuzzleSerializer implements Serializer<Puzzle> {
     public static final PuzzleSerializer INSTANCE = new PuzzleSerializer();
 
@@ -27,7 +29,7 @@ public class PuzzleSerializer implements Serializer<Puzzle> {
     @Override
     public Puzzle deserialize(DataInputStream stream) throws IOException {
         Puzzle puzzle = new Puzzle();
-        BridgeSerializer bridgeSerializer = new BridgeSerializer(puzzle);
+
 
         int numIslands = stream.readInt();
         for(int i = 0; i < numIslands; ++i) {
@@ -36,7 +38,7 @@ public class PuzzleSerializer implements Serializer<Puzzle> {
 
         int numBridges = stream.readInt();
         for(int i = 0; i < numBridges; ++i) {
-            puzzle.getBridges().add(bridgeSerializer.deserialize(stream));
+            puzzle.getBridges().add(BridgeSerializer.INSTANCE.deserialize(stream));
         }
 
         return puzzle;

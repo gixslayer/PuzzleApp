@@ -31,7 +31,6 @@ public class BridgeTest {
                 if(n1 == n2) continue;
                 if(n1.getX() != n2.getX() && n1.getY() != n2.getY()) continue;
 
-                //edges.add(new Bridge(n1, n2));
                 edges.add(Bridge.create(n1, n2));
             }
         }
@@ -144,7 +143,7 @@ public class BridgeTest {
 
     @Test
     public void crossesEndpoints() {
-        edges.forEach(e -> assertFalse(e.crosses(e.getFirstEndpoint())));
-        edges.forEach(e -> assertFalse(e.crosses(e.getSecondEndpoint())));
+        edges.forEach(e -> assertFalse(e.crosses(e.getX1(), e.getY1())));
+        edges.forEach(e -> assertFalse(e.crosses(e.getX2(), e.getY2())));
     }
 }

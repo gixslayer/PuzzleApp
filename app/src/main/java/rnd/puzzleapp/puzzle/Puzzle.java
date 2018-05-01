@@ -38,7 +38,7 @@ public class Puzzle implements Comparable<Puzzle> {
                 .collect(Collectors.toList());
         this.bridges = other.bridges.stream()
                 .sequential()
-                .map(b -> b.copy(this))
+                .map(Bridge::copy)
                 .collect(Collectors.toList());
     }
 
@@ -49,8 +49,21 @@ public class Puzzle implements Comparable<Puzzle> {
     public Stream<Island> getNeighbors(Island island) {
         return bridges.stream()
                 .filter(b -> b.hasEndpoint(island))
-                .map(b -> b.getOtherEndpoint(island))
+                .map(b -> getOtherEndpoint(b, island))
                 .distinct();
+    }
+
+    private Island getOtherEndpoint(Bridge bridge, Island island) {
+        boolean isFirstEndpoint = bridge.getX1() == island.getX() && bridge.getY1() == island.getY();
+        int x = isFirstEndpoint ? bridge.getX2() : bridge.getX1();
+        int y = isFirstEndpoint ? bridge.getY2() : bridge.getY1();
+        Optional<Island> otherIsland = getIsland(x, y);
+
+        if(!otherIsland.isPresent()) {
+            throw new IllegalArgumentException("Other endpoint does not exist");
+        }
+
+        return otherIsland.get();
     }
 
     private boolean hasRequiredBridgeCount() {
@@ -107,7 +120,7 @@ public class Puzzle implements Comparable<Puzzle> {
 
     public boolean canPlaceBridge(Bridge bridge) {
         return bridge.isStraight()
-                && !bridge.getFirstEndpoint().equals(bridge.getSecondEndpoint())
+                && !bridge.isLoop()
                 && bridges.stream().filter(bridge::equals).count() < MAX_BRIDGE_COUNT
                 && islands.stream().noneMatch(bridge::crosses)
                 && (bridges.stream().noneMatch(bridge::intersects)
