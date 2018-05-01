@@ -4,18 +4,18 @@ import rnd.puzzleapp.puzzle.Puzzle;
 
 public class SolveResult {
     private final Puzzle puzzle;
-    private final SolveState state;
+    private final boolean isSolved;
 
-    public SolveResult(Puzzle puzzle, SolveState state) {
+    public SolveResult(Puzzle puzzle, boolean isSolved) {
         this.puzzle = puzzle;
-        this.state = state;
+        this.isSolved = isSolved;
     }
 
     public Puzzle getPuzzle() {
         return puzzle;
     }
 
-    public SolveState getState() {
-        return state;
+    public boolean isSolved() {
+        return isSolved;
     }
 }

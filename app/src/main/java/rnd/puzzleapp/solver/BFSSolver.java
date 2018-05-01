@@ -11,7 +11,7 @@ import rnd.puzzleapp.puzzle.PuzzleStatus;
 
 import static rnd.puzzleapp.utils.Collections.iteratorCompare;
 
-public class BFSSolver implements SolveStrategy {
+public class BFSSolver implements PuzzleSolver {
     private final List<Puzzle> searchSpace;
     private final Set<Puzzle> searchSpaceSet;
 
@@ -35,7 +35,7 @@ public class BFSSolver implements SolveStrategy {
                 PuzzleStatus status = newPuzzle.getStatus();
 
                 if(status == PuzzleStatus.Solved) {
-                    return new SolveResult(newPuzzle, SolveState.Solved);
+                    return new SolveResult(newPuzzle, true);
                 } else if(shouldAddToSearchSpace(newPuzzle)) {
                     addToSearchSpace(newPuzzle);
                 }
@@ -44,7 +44,7 @@ public class BFSSolver implements SolveStrategy {
             ++currentIndex;
         }
 
-        return new SolveResult(searchSpace.get(0), SolveState.Unsolved);
+        return new SolveResult(puzzle, false);
     }
 
     private boolean shouldAddToSearchSpace(Puzzle puzzle) {

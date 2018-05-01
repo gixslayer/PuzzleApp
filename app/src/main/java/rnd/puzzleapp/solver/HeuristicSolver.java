@@ -11,7 +11,7 @@ import rnd.puzzleapp.puzzle.PuzzleStatus;
 
 import static rnd.puzzleapp.utils.Collections.iteratorCompare;
 
-public class HeuristicSolver implements SolveStrategy {
+public class HeuristicSolver implements PuzzleSolver {
     private final Queue<State> searchSpace;
     private final Set<Puzzle> searchSpaceSet;
 
@@ -34,14 +34,14 @@ public class HeuristicSolver implements SolveStrategy {
                 PuzzleStatus status = newPuzzle.getStatus();
 
                 if(status == PuzzleStatus.Solved) {
-                    return new SolveResult(newPuzzle, SolveState.Solved);
+                    return new SolveResult(newPuzzle, true);
                 } else if(shouldAddToSearchSpace(newPuzzle)) {
                     addToSearchSpace(newPuzzle);
                 }
             }
         }
 
-        return new SolveResult(puzzle, SolveState.Unsolved);
+        return new SolveResult(puzzle, false);
     }
 
     private boolean shouldAddToSearchSpace(Puzzle puzzle) {
@@ -59,10 +59,10 @@ public class HeuristicSolver implements SolveStrategy {
     }
 
     private class State {
-        public Puzzle puzzle;
-        public long heuristic;
+        Puzzle puzzle;
+        long heuristic;
 
-        public State(Puzzle puzzle) {
+        State(Puzzle puzzle) {
             this.puzzle = puzzle;
             this.heuristic = puzzle.getIslands().stream()
                     .filter(i -> puzzle.getBridgeCount(i) == i.getRequiredBridges())

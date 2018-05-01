@@ -9,17 +9,30 @@ import rnd.puzzleapp.puzzle.RandomPuzzleGenerator;
 public class SolverTest {
 
     @Test
-    public void trySolve() {
+    public void heuristic() {
         int nodes = 16;
         PuzzleGenerator generator = new RandomPuzzleGenerator(2, nodes, nodes);
         Puzzle solution = generator.generate(true);
         Puzzle puzzle = solution.copy();
         puzzle.getBridges().clear();
 
-        SolveStrategy strategy = new HeuristicSolver();
-        PuzzleSolver solver = new PuzzleSolver(puzzle, strategy);
-        SolveResult result = solver.solve();
+        PuzzleSolver solver = new HeuristicSolver();
+        SolveResult result = solver.solve(puzzle);
 
-        System.out.printf("Status: %s", result.getState());
+        System.out.printf("Heuristic solved: %s\n", result.isSolved() ? "yes" : "no");
+    }
+
+    @Test
+    public void bfs() {
+        int nodes = 8;
+        PuzzleGenerator generator = new RandomPuzzleGenerator(2, nodes, nodes);
+        Puzzle solution = generator.generate(true);
+        Puzzle puzzle = solution.copy();
+        puzzle.getBridges().clear();
+
+        PuzzleSolver solver = new BFSSolver();
+        SolveResult result = solver.solve(puzzle);
+
+        System.out.printf("BFS solved: %s\n", result.isSolved() ? "yes" : "no");
     }
 }
