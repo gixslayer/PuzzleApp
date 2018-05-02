@@ -20,6 +20,10 @@ public class StorageManager {
                 .collect(Collectors.toList());
     }
 
+    public static Optional<StoredPuzzle> load(Context context, String name) {
+        return StoredPuzzle.load(getPuzzlePath(context, name));
+    }
+
     public static boolean save(Context context, StoredPuzzle puzzle) {
         return puzzle.save(getPuzzlePath(context, puzzle));
     }
@@ -34,7 +38,11 @@ public class StorageManager {
     }
 
     private static File getPuzzlePath(Context context, StoredPuzzle puzzle) {
-        File puzzlePath = new File(getPuzzlesPath(context), puzzle.getName());
+        return getPuzzlePath(context, puzzle.getName());
+    }
+
+    private static File getPuzzlePath(Context context, String name) {
+        File puzzlePath = new File(getPuzzlesPath(context), name);
         if(!puzzlePath.exists()) {
             puzzlePath.mkdir();
         }

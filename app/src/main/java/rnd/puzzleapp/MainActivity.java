@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
+import java.util.Locale;
+
 import rnd.puzzleapp.graphics.ThumbnailRenderer;
 import rnd.puzzleapp.puzzle.Puzzle;
 import rnd.puzzleapp.puzzle.PuzzleGenerator;
@@ -17,7 +19,8 @@ import rnd.puzzleapp.storage.StoredPuzzle;
 public class MainActivity extends AppCompatActivity {
 
     static long seed = 0;
-    static Puzzle puzzle;
+    static Puzzle solution;
+    static Bitmap thumbnail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,22 +32,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void genPuzzle(View view) {
         PuzzleGenerator generator = new RandomPuzzleGenerator(++seed, 4, 64);
-        puzzle = generator.generate();
-        ThumbnailRenderer thumbnailRenderer = new ThumbnailRenderer(puzzle);
-        Bitmap thumbnail = thumbnailRenderer.drawLarge();
+        solution = generator.generate();
+        ThumbnailRenderer thumbnailRenderer = new ThumbnailRenderer(solution);
+        thumbnail = thumbnailRenderer.drawLarge();
         ImageView imageView = findViewById(R.id.thumbnail);
 
         imageView.setImageBitmap(thumbnail);
-
-        //Puzzle p = puzzle.copy();
-        //p.getBridges().clear();
-        //StorageManager.save(this, StoredPuzzle.create(String.format("puzzle_%d", seed - 1), p, puzzle, thumbnail));
-
     }
 
     public void clicked(View view) {
-        Intent intent = new Intent(this, PuzzleActivity.class);
-        PuzzleActivity.puzzle = puzzle;
-        startActivity(intent);
+        Puzzle puzzle = solution.copy();
+        puzzle.getBridges().clear();
+        String name = String.format(Locale.US, "puzzle_%d", seed - 1);
+
+        if(StorageManager.save(this, StoredPuzzle.create(name, puzzle, solution, thumbnail))) {
+            Intent intent = new Intent(this, PuzzleActivity.class);
+            intent.putExtra("puzzle_name", name);
+            startActivity(intent);
+        }
     }
 }
