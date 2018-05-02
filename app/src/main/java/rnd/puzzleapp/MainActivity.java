@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     static Bitmap thumbnail;
 
     @Override
-    protected void onCreate(Bundle savedInstanceSstatustate) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
