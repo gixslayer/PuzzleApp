@@ -54,6 +54,10 @@ public class PuzzleView extends View {
         puzzleController.setOnSelectionChangedListener((island, mode) -> invalidate());
     }
 
+    public PuzzleController getPuzzleController() {
+        return puzzleController;
+    }
+
     private void onPuzzleChanged(Puzzle puzzle) {
         invalidate();
 

@@ -10,19 +10,38 @@ import rnd.puzzleapp.storage.StorageManager;
 import rnd.puzzleapp.storage.StoredPuzzle;
 
 public class PuzzleActivity extends AppCompatActivity {
+    public static final String PUZZLE_NAME_KEY = "puzzle_name";
+
+    private StoredPuzzle storedPuzzle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_puzzle);
 
-        PuzzleView puzzleView = findViewById(R.id.puzzleview);
-        String puzzleName = getIntent().getStringExtra("puzzle_name");
-        Optional<StoredPuzzle> storedPuzzle = StorageManager.load(this, puzzleName);
-        storedPuzzle.ifPresent(p -> puzzleView.setPuzzle(p.getPuzzle()));
+        String puzzleName = getIntent().getStringExtra(PUZZLE_NAME_KEY);
+        Optional<StoredPuzzle> puzzle = StorageManager.load(this, puzzleName);
 
-        if(!storedPuzzle.isPresent()) {
+        setTitle("PuzzleApp - " + puzzleName);
+
+        if(!puzzle.isPresent()) {
             // TODO: Handle error.
             Toast.makeText(this, "Could not load puzzle", Toast.LENGTH_SHORT).show();
+        } else {
+            PuzzleView puzzleView = findViewById(R.id.puzzleview);
+            storedPuzzle = puzzle.get();
+
+            puzzleView.setPuzzle(storedPuzzle.getPuzzle());
+            puzzleView.getPuzzleController().setOnPuzzleChangedListener(p -> storedPuzzle.markDirty());
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if(storedPuzzle.isDirty()) {
+            StorageManager.save(this, storedPuzzle);
         }
     }
 }

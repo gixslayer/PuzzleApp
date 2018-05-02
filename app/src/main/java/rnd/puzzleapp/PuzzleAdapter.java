@@ -28,6 +28,10 @@ public class PuzzleAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int i) {
+        return getPuzzle(i);
+    }
+
+    public StoredPuzzle getPuzzle(int i) {
         return puzzles.get(i);
     }
 
