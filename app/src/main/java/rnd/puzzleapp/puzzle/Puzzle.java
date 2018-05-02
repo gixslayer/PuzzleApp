@@ -21,6 +21,8 @@ public class Puzzle implements Comparable<Puzzle> {
     // TODO: Online this rule is mentioned, but project description doesn't explicitly state this.
     public static final int MAX_BRIDGE_COUNT = 2;
 
+    private static final FastCopyTag FAST_COPY_TAG = new FastCopyTag();
+
     private final List<Island> islands;
     private final List<Bridge> bridges;
 
@@ -41,8 +43,19 @@ public class Puzzle implements Comparable<Puzzle> {
                 .collect(Collectors.toList());
     }
 
+    private Puzzle(Puzzle other, FastCopyTag tag) {
+        this.islands = other.islands;
+        this.bridges = new ArrayList<>(other.bridges);
+    }
+
     public Puzzle copy() {
         return new Puzzle(this);
+    }
+
+    public Puzzle fastCopy() {
+        // NOTE: A fast semi-shallow copy method that is only intended for solvers to minimize copy
+        // overhead and allocation count (to reduce pressure on the GC).
+        return new Puzzle(this, FAST_COPY_TAG);
     }
 
     public Stream<Island> getNeighbors(Island island) {
@@ -113,6 +126,11 @@ public class Puzzle implements Comparable<Puzzle> {
         return doIf(canPlaceBridge(bridge), () -> addSorted(bridges, bridge));
     }
 
+    public void placeBridgeUnchecked(Bridge bridge) {
+        // NOTE: This method is only intended for solvers in order to improve performance.
+        addSorted(bridges, bridge);
+    }
+
     public boolean deleteBridge(Bridge bridge) {
         return bridges.remove(bridge);
     }
@@ -140,12 +158,6 @@ public class Puzzle implements Comparable<Puzzle> {
         return islands.stream().filter(i -> i.getX() == x && i.getY() == y).findFirst();
     }
 
-    public Optional<Island> getIsland(int i) {
-        int width = getWidth();
-
-        return getIsland(i % width, i / width);
-    }
-
     public int getWidth() {
         return islands.stream().map(Island::getX).max(Integer::compare).map(i -> i + 1).orElse(0);
     }
@@ -162,10 +174,20 @@ public class Puzzle implements Comparable<Puzzle> {
         return bridges;
     }
 
-    public Iterable<Bridge> getPossibleBridges() {
+    public List<Bridge> getPossibleBridges() {
         return crossApply(islands, Bridge::create)
                 .filter(this::canPlaceBridge)
                 .collect(Collectors.toList());
+    }
+
+    public List<Bridge> getPossibleBridges(List<Bridge> possibleBridges) {
+        return possibleBridges.stream().filter(this::canStillPlaceBridge).collect(Collectors.toList());
+    }
+
+    private boolean canStillPlaceBridge(Bridge bridge) {
+        return bridges.stream().filter(bridge::equals).count() < MAX_BRIDGE_COUNT
+                && (bridges.stream().noneMatch(bridge::intersects)
+                || bridges.stream().anyMatch(bridge::equals));
     }
 
     @Override
@@ -186,4 +208,6 @@ public class Puzzle implements Comparable<Puzzle> {
 
         return islandCompare != 0 ? islandCompare : iteratorCompare(bridges, puzzle.bridges);
     }
+
+    private static class FastCopyTag { }
 }

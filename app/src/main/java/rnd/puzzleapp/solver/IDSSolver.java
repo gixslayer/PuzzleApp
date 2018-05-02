@@ -1,8 +1,10 @@
 package rnd.puzzleapp.solver;
 
+import java.util.List;
 import java.util.Stack;
 
 import rnd.puzzleapp.puzzle.Bridge;
+import rnd.puzzleapp.puzzle.Island;
 import rnd.puzzleapp.puzzle.Puzzle;
 import rnd.puzzleapp.puzzle.PuzzleStatus;
 
@@ -10,6 +12,10 @@ public class IDSSolver implements PuzzleSolver {
     private final Stack<Puzzle> searchPath;
     private final int maxDepthLimit;
     private int depthLimit;
+
+    public IDSSolver() {
+        this(Integer.MAX_VALUE);
+    }
 
     public IDSSolver(int maxDepthLimit) {
         this.searchPath = new Stack<>();
@@ -19,11 +25,13 @@ public class IDSSolver implements PuzzleSolver {
 
     @Override
     public SolveResult solve(Puzzle puzzle) {
-        for(depthLimit = 1; depthLimit <= maxDepthLimit; ++depthLimit) {
-            searchPath.clear();
-            searchPath.push(puzzle);
+        searchPath.clear();
+        Puzzle puzzleCopy = puzzle.copy();
 
-            SolveResult result = expand(puzzle);
+        for(depthLimit = minDepth(puzzle); depthLimit <= maxDepthLimit; ++depthLimit) {
+            searchPath.clear();
+
+            SolveResult result = expand(puzzleCopy, puzzle.getPossibleBridges());
 
             if(result != null) {
                 return result;
@@ -33,7 +41,17 @@ public class IDSSolver implements PuzzleSolver {
         return new SolveResult(puzzle, false);
     }
 
-    private SolveResult expand(Puzzle puzzle) {
+    private int minDepth(Puzzle puzzle) {
+        // No point in trying to solve puzzles using less moves than required, so compute a lower bound.
+        return puzzle.getIslands().stream()
+                .map(Island::getRequiredBridges)
+                .reduce(Integer::sum)
+                .orElse(2) / 2;
+    }
+
+    private SolveResult expand(Puzzle puzzle, List<Bridge> prevPossibleBridges) {
+        searchPath.push(puzzle);
+
         if(puzzle.getStatus() == PuzzleStatus.Solved) {
             return new SolveResult(puzzle, true);
         } else if(searchPath.size() > depthLimit) {
@@ -42,13 +60,14 @@ public class IDSSolver implements PuzzleSolver {
             return null;
         }
 
-        for (Bridge move : puzzle.getPossibleBridges()) {
-            Puzzle newPuzzle = puzzle.copy();
-            newPuzzle.placeBridge(move);
+        List<Bridge> possibleBridges = puzzle.getPossibleBridges(prevPossibleBridges);
+
+        for (Bridge move : possibleBridges) {
+            Puzzle newPuzzle = puzzle.fastCopy();
+            newPuzzle.placeBridgeUnchecked(move);
 
             if (!searchPath.contains(newPuzzle)) {
-                searchPath.push(newPuzzle);
-                SolveResult result = expand(newPuzzle);
+                SolveResult result = expand(newPuzzle, possibleBridges);
 
                 if (result != null) {
                     return result;

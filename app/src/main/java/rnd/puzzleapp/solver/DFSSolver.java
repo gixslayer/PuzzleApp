@@ -1,5 +1,6 @@
 package rnd.puzzleapp.solver;
 
+import java.util.List;
 import java.util.Stack;
 
 import rnd.puzzleapp.puzzle.Bridge;
@@ -15,27 +16,29 @@ public class DFSSolver implements PuzzleSolver {
 
     @Override
     public SolveResult solve(Puzzle puzzle) {
-        searchPath.push(puzzle);
-
-        SolveResult result = expand(puzzle);
+        searchPath.clear();
+        SolveResult result = expand(puzzle.copy(), puzzle.getPossibleBridges());
 
         return result != null ? result : new SolveResult(puzzle, false);
     }
 
-    private SolveResult expand(Puzzle puzzle) {
+    private SolveResult expand(Puzzle puzzle, List<Bridge> prevPossibleBridges) {
+        searchPath.push(puzzle);
+
         if(puzzle.getStatus() == PuzzleStatus.Solved) {
             return new SolveResult(puzzle, true);
         } else if(!isSolvable(puzzle)) {
             return null;
         }
 
-        for (Bridge move : puzzle.getPossibleBridges()) {
-            Puzzle newPuzzle = puzzle.copy();
-            newPuzzle.placeBridge(move);
+        List<Bridge> possibleBridges = puzzle.getPossibleBridges(prevPossibleBridges);
+
+        for (Bridge move : possibleBridges) {
+            Puzzle newPuzzle = puzzle.fastCopy();
+            newPuzzle.placeBridgeUnchecked(move);
 
             if (!searchPath.contains(newPuzzle)) {
-                searchPath.push(newPuzzle);
-                SolveResult result = expand(newPuzzle);
+                SolveResult result = expand(newPuzzle, possibleBridges);
 
                 if (result != null) {
                     return result;

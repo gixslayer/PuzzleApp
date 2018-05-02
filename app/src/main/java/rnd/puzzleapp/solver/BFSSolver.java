@@ -23,15 +23,18 @@ public class BFSSolver implements PuzzleSolver {
     @Override
     public SolveResult solve(Puzzle puzzle) {
         searchSpace.clear();
+        searchSpaceSet.clear();
         searchSpace.add(puzzle.copy());
         int currentIndex = 0;
+
+        List<Bridge> possibleBridges = puzzle.getPossibleBridges();
 
         while(currentIndex < searchSpace.size()) {
             Puzzle currentPuzzle = searchSpace.get(currentIndex);
 
-            for(Bridge bridge : currentPuzzle.getPossibleBridges()) {
-                Puzzle newPuzzle = currentPuzzle.copy();
-                newPuzzle.placeBridge(bridge);
+            for(Bridge bridge : currentPuzzle.getPossibleBridges(possibleBridges)) {
+                Puzzle newPuzzle = currentPuzzle.fastCopy();
+                newPuzzle.placeBridgeUnchecked(bridge);
                 PuzzleStatus status = newPuzzle.getStatus();
 
                 if(status == PuzzleStatus.Solved) {

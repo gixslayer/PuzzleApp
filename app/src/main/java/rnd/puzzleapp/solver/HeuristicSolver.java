@@ -1,5 +1,6 @@
 package rnd.puzzleapp.solver;
 
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
@@ -23,14 +24,17 @@ public class HeuristicSolver implements PuzzleSolver {
     @Override
     public SolveResult solve(Puzzle puzzle) {
         searchSpace.clear();
+        searchSpaceSet.clear();
         searchSpace.add(new State(puzzle.copy()));
+
+        List<Bridge> possibleBridges = puzzle.getPossibleBridges();
 
         while(!searchSpace.isEmpty()) {
             Puzzle currentPuzzle = searchSpace.remove().puzzle;
 
-            for(Bridge bridge : currentPuzzle.getPossibleBridges()) {
-                Puzzle newPuzzle = currentPuzzle.copy();
-                newPuzzle.placeBridge(bridge);
+            for(Bridge bridge : currentPuzzle.getPossibleBridges(possibleBridges)) {
+                Puzzle newPuzzle = currentPuzzle.fastCopy();
+                newPuzzle.placeBridgeUnchecked(bridge);
                 PuzzleStatus status = newPuzzle.getStatus();
 
                 if(status == PuzzleStatus.Solved) {
