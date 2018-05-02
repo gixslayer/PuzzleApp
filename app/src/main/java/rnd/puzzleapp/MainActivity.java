@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     static Bitmap thumbnail;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceSstatustate) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -50,5 +50,10 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("puzzle_name", name);
             startActivity(intent);
         }
+    }
+
+    public void listPuzzles(View view) {
+        Intent intent = new Intent(this, ListPuzzlesActivity.class);
+        startActivity(intent);
     }
 }
