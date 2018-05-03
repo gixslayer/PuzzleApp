@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Comparator;
 import java.util.List;
 
 import rnd.puzzleapp.storage.StoredPuzzle;
@@ -19,6 +20,9 @@ public class PuzzleAdapter extends BaseAdapter {
     public PuzzleAdapter(Context context, List<StoredPuzzle> puzzles) {
         this.context = context;
         this.puzzles = puzzles;
+
+        // TODO: More natural sort based on incremental difficulty?
+        this.puzzles.sort(Comparator.comparing(StoredPuzzle::getName));
     }
 
     @Override

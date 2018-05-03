@@ -1,12 +1,20 @@
 package rnd.puzzleapp.storage;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import rnd.puzzleapp.graphics.ThumbnailRenderer;
+import rnd.puzzleapp.puzzle.Puzzle;
+import rnd.puzzleapp.puzzle.PuzzleDifficulty;
+import rnd.puzzleapp.puzzle.PuzzleGenerator;
+import rnd.puzzleapp.puzzle.RandomPuzzleGenerator;
 
 public class StorageManager {
     private static final String PUZZLES_PATH = "puzzles";
@@ -26,6 +34,48 @@ public class StorageManager {
 
     public static boolean save(Context context, StoredPuzzle puzzle) {
         return puzzle.save(getPuzzlePath(context, puzzle));
+    }
+
+    public static void generatePuzzles(Context context) {
+        for (PuzzleDifficulty difficulty : PuzzleDifficulty.values()) {
+            for (int i = 1; i <= 8; ++i) {
+                generate(context, difficulty, i);
+            }
+        }
+    }
+
+    public static boolean shouldGeneratePuzzles(Context context) {
+        return !new File(context.getFilesDir(), PUZZLES_PATH).exists();
+    }
+
+    private static boolean generate(Context context, PuzzleDifficulty difficulty, int i) {
+        long seed = ((long)difficulty.hashCode() << 32L) | i;
+        PuzzleGenerator generator = new RandomPuzzleGenerator(seed, difficulty.getMinNodes(), difficulty.getMaxNodes());
+        Puzzle solution = generator.generate(true);
+        Puzzle puzzle = solution.copy();
+        puzzle.getBridges().clear();
+        Bitmap thumbnail = new ThumbnailRenderer(puzzle).draw();
+        String name = String.format(Locale.US, "%s %d", difficulty.getName(), i);
+        StoredPuzzle storedPuzzle = StoredPuzzle.create(name, puzzle, solution, thumbnail);
+
+        return save(context, storedPuzzle);
+    }
+
+    public static boolean deleteAll(Context context) {
+        File puzzlesPath = getPuzzlesPath(context);
+        boolean ok = true;
+
+        for(File puzzlePath : puzzlesPath.listFiles(File::isDirectory)) {
+            for(File file : puzzlePath.listFiles()) {
+                ok &= file.delete();
+            }
+
+            ok &= puzzlePath.delete();
+        }
+
+        ok &= puzzlesPath.delete();
+
+        return ok;
     }
 
     private static File getPuzzlesPath(Context context) {

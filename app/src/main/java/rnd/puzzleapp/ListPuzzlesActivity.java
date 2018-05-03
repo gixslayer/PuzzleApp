@@ -13,6 +13,7 @@ import rnd.puzzleapp.storage.StorageManager;
 import rnd.puzzleapp.storage.StoredPuzzle;
 
 public class ListPuzzlesActivity extends AppCompatActivity {
+    // TODO: Returning to this Activity from the PuzzleActivity should update the respective puzzle.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

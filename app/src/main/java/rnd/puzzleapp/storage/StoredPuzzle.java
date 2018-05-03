@@ -24,8 +24,9 @@ public class StoredPuzzle {
     private final String name;
     private final Puzzle puzzle;
     private final Puzzle solution;
-    private final Bitmap thumbnail;
+    private Bitmap thumbnail;
     private boolean isDirty;
+    private boolean isThumbnailDirty;
 
     private StoredPuzzle(String name, Puzzle puzzle, Puzzle solution, Bitmap thumbnail, boolean isDirty) {
         this.name = name;
@@ -33,6 +34,7 @@ public class StoredPuzzle {
         this.solution = solution;
         this.thumbnail = thumbnail;
         this.isDirty = isDirty;
+        this.isThumbnailDirty = false;
     }
 
     public String getName() {
@@ -57,6 +59,7 @@ public class StoredPuzzle {
 
     public void markDirty() {
         isDirty = true;
+        isThumbnailDirty = true;
     }
 
     public boolean save(File path) {
@@ -64,6 +67,11 @@ public class StoredPuzzle {
         File solutionPath = new File(path, SOLUTION_NAME);
         File thumbnailPath = new File(path, THUMBNAIL_NAME);
         boolean saved = true;
+
+        if(isThumbnailDirty) {
+            thumbnail = renderThumbnail(puzzle);
+            isThumbnailDirty = false;
+        }
 
         saved &= FileSystem.save(puzzlePath, StoredPuzzle::puzzleSaver, puzzle);
         saved &= FileSystem.save(solutionPath, StoredPuzzle::puzzleSaver, solution);
