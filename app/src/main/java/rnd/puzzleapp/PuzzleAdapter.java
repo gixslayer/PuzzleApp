@@ -21,8 +21,13 @@ public class PuzzleAdapter extends BaseAdapter {
         this.context = context;
         this.puzzles = puzzles;
 
-        // TODO: More natural sort based on incremental difficulty?
-        this.puzzles.sort(Comparator.comparing(StoredPuzzle::getName));
+        sortPuzzles();
+    }
+
+    public void update(StoredPuzzle puzzle) {
+        puzzles.removeIf(p -> p.getName().equals(puzzle.getName()));
+        puzzles.add(puzzle);
+        sortPuzzles();
     }
 
     @Override
@@ -63,5 +68,10 @@ public class PuzzleAdapter extends BaseAdapter {
         thumbnailView.setImageBitmap(puzzle.getThumbnail());
 
         return gridItemView;
+    }
+
+    private void sortPuzzles() {
+        // TODO: More natural sort based on incremental difficulty?
+        puzzles.sort(Comparator.comparing(StoredPuzzle::getName));
     }
 }
