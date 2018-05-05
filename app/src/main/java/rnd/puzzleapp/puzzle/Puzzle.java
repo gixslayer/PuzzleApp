@@ -58,6 +58,10 @@ public class Puzzle implements Comparable<Puzzle> {
         return new Puzzle(this, FAST_COPY_TAG);
     }
 
+    public void reset() {
+        bridges.clear();
+    }
+
     public Stream<Island> getNeighbors(Island island) {
         return bridges.stream()
                 .filter(b -> b.hasEndpoint(island))

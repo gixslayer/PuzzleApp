@@ -8,9 +8,11 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
+import rnd.puzzleapp.puzzle.Puzzle;
 import rnd.puzzleapp.storage.StoredPuzzle;
 
 public class PuzzleAdapter extends BaseAdapter {
@@ -25,9 +27,19 @@ public class PuzzleAdapter extends BaseAdapter {
     }
 
     public void update(StoredPuzzle puzzle) {
-        puzzles.removeIf(p -> p.getName().equals(puzzle.getName()));
+        remove(puzzle);
         puzzles.add(puzzle);
         sortPuzzles();
+    }
+
+    public void updateAll(Collection<StoredPuzzle> newPuzzles) {
+        puzzles.clear();
+        puzzles.addAll(newPuzzles);
+        sortPuzzles();
+    }
+
+    public void remove(StoredPuzzle puzzle) {
+        puzzles.removeIf(p -> p.getName().equals(puzzle.getName()));
     }
 
     @Override
@@ -42,6 +54,10 @@ public class PuzzleAdapter extends BaseAdapter {
 
     public StoredPuzzle getPuzzle(int i) {
         return puzzles.get(i);
+    }
+
+    public List<StoredPuzzle> getPuzzles() {
+        return puzzles;
     }
 
     @Override

@@ -78,6 +78,19 @@ public class StorageManager {
         return ok;
     }
 
+    public static boolean delete(Context context, StoredPuzzle puzzle) {
+        File puzzlePath = getPuzzlePath(context, puzzle);
+        boolean ok = true;
+
+        for(File file : puzzlePath.listFiles()) {
+            ok &= file.delete();
+        }
+
+        ok &= puzzlePath.delete();
+
+        return ok;
+    }
+
     private static File getPuzzlesPath(Context context) {
         File puzzlesPath = new File(context.getFilesDir(), PUZZLES_PATH);
         if(!puzzlesPath.exists()) {

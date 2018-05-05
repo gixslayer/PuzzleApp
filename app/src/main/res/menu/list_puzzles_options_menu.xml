@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/list_puzzles_option_recreate"
+        android:title="Recreate puzzles" />
+    <item
+        android:id="@+id/list_puzzles_option_reset"
+        android:title="Reset all puzzles" />
+</menu>

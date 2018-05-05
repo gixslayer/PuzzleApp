@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import rnd.puzzleapp.puzzle.Bridge;
 import rnd.puzzleapp.puzzle.Island;
 import rnd.puzzleapp.puzzle.Puzzle;
+import rnd.puzzleapp.puzzle.PuzzleStatus;
 
 import static rnd.puzzleapp.utils.Functional.doIf;
 
@@ -17,11 +18,13 @@ public class PuzzleController {
     private final List<BiConsumer<Island, SelectionMode>> selectionChangedListeners;
     private Island selectedIsland;
     private SelectionMode selectedMode;
+    private boolean viewOnly;
 
     public PuzzleController(Puzzle puzzle) {
         this.puzzle = puzzle;
         this.puzzleChangedListeners = new ArrayList<>();
         this.selectionChangedListeners = new ArrayList<>();
+        this.viewOnly = false;
     }
 
     public void setOnPuzzleChangedListener(Consumer<Puzzle> puzzleChangedListener) {
@@ -32,14 +35,34 @@ public class PuzzleController {
         selectionChangedListeners.add(selectionChangedListener);
     }
 
+    public void setViewOnly(boolean value) {
+        viewOnly = value;
+    }
+
+    public boolean isViewOnly() {
+        return viewOnly;
+    }
+
+    public void resetPuzzle() {
+        if(!viewOnly && puzzle.getStatus() != PuzzleStatus.Untouched) {
+            puzzle.reset();
+
+            notifyPuzzleChangedListeners(puzzle);
+        }
+    }
+
     public void onLongPress(int x, int y) {
-        puzzle.getIsland(x, y).ifPresent(i -> changeSelection(i, SelectionMode.delete));
-        puzzle.getBridge(x, y).ifPresent(this::deleteBridge);
+        if(!viewOnly) {
+            puzzle.getIsland(x, y).ifPresent(i -> changeSelection(i, SelectionMode.delete));
+            puzzle.getBridge(x, y).ifPresent(this::deleteBridge);
+        }
     }
 
     public void onSingleTap(int x, int y) {
-        puzzle.getIsland(x, y).ifPresent(this::onTapIsland);
-        puzzle.getBridge(x, y).ifPresent(this::placeBridge);
+        if(!viewOnly) {
+            puzzle.getIsland(x, y).ifPresent(this::onTapIsland);
+            puzzle.getBridge(x, y).ifPresent(this::placeBridge);
+        }
     }
 
     private void onTapIsland(Island island) {
