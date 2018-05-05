@@ -61,6 +61,15 @@ public class SolverTest {
     }
 
     @Test
+    public void smart() {
+        PuzzleSolver solver = new SmartSolver();
+
+        SolveResult result = solver.solve(puzzle);
+
+        System.out.printf("Smart solved: %s\n", result.isSolved() ? "yes" : "no");
+    }
+
+    @Test
     public void heuristicLarge() {
         PuzzleSolver solver = new HeuristicSolver();
         Puzzle largePuzzle = generatePuzzle(2, 16);
@@ -68,5 +77,35 @@ public class SolverTest {
         SolveResult result = solver.solve(largePuzzle);
 
         System.out.printf("Heuristic large solved: %s\n", result.isSolved() ? "yes" : "no");
+    }
+
+    @Test
+    public void smartLarge() {
+        PuzzleSolver solver = new SmartSolver();
+        Puzzle largePuzzle = generatePuzzle(2, 16);
+
+        SolveResult result = solver.solve(largePuzzle);
+
+        System.out.printf("Smart large solved: %s\n", result.isSolved() ? "yes" : "no");
+    }
+
+    @Test
+    public void smartHuge() {
+        PuzzleSolver solver = new SmartSolver();
+        Puzzle largePuzzle = generatePuzzle(2, 32);
+
+        SolveResult result = solver.solve(largePuzzle);
+
+        System.out.printf("Smart huge solved: %s\n", result.isSolved() ? "yes" : "no");
+    }
+
+    @Test
+    public void smartExtreme() {
+        PuzzleSolver solver = new SmartSolver();
+        Puzzle largePuzzle = generatePuzzle(2, 48);
+
+        SolveResult result = solver.solve(largePuzzle);
+
+        System.out.printf("Smart extreme solved: %s\n", result.isSolved() ? "yes" : "no");
     }
 }

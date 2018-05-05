@@ -69,7 +69,7 @@ public class Puzzle implements Comparable<Puzzle> {
                 .distinct();
     }
 
-    private Island getOtherEndpoint(Bridge bridge, Island island) {
+    public Island getOtherEndpoint(Bridge bridge, Island island) {
         boolean isFirstEndpoint = bridge.getX1() == island.getX() && bridge.getY1() == island.getY();
         int x = isFirstEndpoint ? bridge.getX2() : bridge.getX1();
         int y = isFirstEndpoint ? bridge.getY2() : bridge.getY1();
@@ -189,9 +189,17 @@ public class Puzzle implements Comparable<Puzzle> {
     }
 
     private boolean canStillPlaceBridge(Bridge bridge) {
-        return bridges.stream().filter(bridge::equals).count() < MAX_BRIDGE_COUNT
+        if(!(bridges.stream().filter(bridge::equals).count() < MAX_BRIDGE_COUNT
                 && (bridges.stream().noneMatch(bridge::intersects)
-                || bridges.stream().anyMatch(bridge::equals));
+                || bridges.stream().anyMatch(bridge::equals)))) {
+            return false;
+        }
+
+        Island island1 = getIsland(bridge.getX1(), bridge.getY1()).get();
+        Island island2 = getIsland(bridge.getX2(), bridge.getY2()).get();
+
+        return getBridgeCount(island1) < island1.getRequiredBridges()
+                && getBridgeCount(island2) < island2.getRequiredBridges();
     }
 
     @Override
