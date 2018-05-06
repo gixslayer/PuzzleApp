@@ -22,6 +22,7 @@ import rnd.puzzleapp.storage.StoredPuzzle;
 public class ListPuzzlesActivity extends AppCompatActivity {
     private PuzzleAdapter puzzleAdapter;
     private String activePuzzle;
+    private boolean generatingRandomPuzzle;
     private GridView gridView;
 
     @Override
@@ -36,6 +37,7 @@ public class ListPuzzlesActivity extends AppCompatActivity {
         List<StoredPuzzle> storedPuzzles = StorageManager.load(this);
         puzzleAdapter = new PuzzleAdapter(this, storedPuzzles);
         activePuzzle = null;
+        generatingRandomPuzzle = false;
 
         gridView = findViewById(R.id.grid_list_puzzles);
         gridView.setAdapter(puzzleAdapter);
@@ -55,6 +57,12 @@ public class ListPuzzlesActivity extends AppCompatActivity {
             });
 
             activePuzzle = null;
+        } else if(generatingRandomPuzzle) {
+            // If a user just returned from generating random puzzles, then reload the puzzle list.
+            puzzleAdapter.updateAll(StorageManager.load(this));
+            gridView.invalidateViews();
+
+            generatingRandomPuzzle = false;
         }
     }
 
@@ -142,6 +150,9 @@ public class ListPuzzlesActivity extends AppCompatActivity {
     }
 
     private void createRandomPuzzle() {
+        // Would really prefer to use a navigation drawer, but don't have the time to rewrite everything into fragments.
+        activePuzzle = null;
+        generatingRandomPuzzle = true;
         Intent intent = new Intent(this, RandomPuzzleActivity.class);
 
         startActivity(intent);
@@ -149,6 +160,7 @@ public class ListPuzzlesActivity extends AppCompatActivity {
 
     private void startPuzzle(StoredPuzzle puzzle) {
         activePuzzle = puzzle.getName();
+        generatingRandomPuzzle = false;
         Intent intent = new Intent(this, PuzzleActivity.class);
         intent.putExtra(PuzzleActivity.PUZZLE_NAME_KEY, activePuzzle);
         intent.putExtra(PuzzleActivity.IS_SOLUTION_KEY, false);
@@ -158,6 +170,7 @@ public class ListPuzzlesActivity extends AppCompatActivity {
 
     private void startSolution(StoredPuzzle puzzle) {
         activePuzzle = null;
+        generatingRandomPuzzle = false;
         Intent intent = new Intent(this, PuzzleActivity.class);
         intent.putExtra(PuzzleActivity.PUZZLE_NAME_KEY, puzzle.getName());
         intent.putExtra(PuzzleActivity.IS_SOLUTION_KEY, true);

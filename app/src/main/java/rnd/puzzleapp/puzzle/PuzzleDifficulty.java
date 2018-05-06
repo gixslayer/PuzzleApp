@@ -1,6 +1,7 @@
 package rnd.puzzleapp.puzzle;
 
 public enum PuzzleDifficulty {
+    // NOTE: Should be declared in increasing order of difficulty for correct sorting.
     VeryEasy("Very easy", 4, 8),
     Easy("Easy", 8, 12),
     Normal("Normal", 12, 16),
