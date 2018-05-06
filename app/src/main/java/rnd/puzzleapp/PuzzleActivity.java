@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import java.util.Optional;
 
+import rnd.puzzleapp.puzzle.Puzzle;
 import rnd.puzzleapp.storage.StorageManager;
 import rnd.puzzleapp.storage.StoredPuzzle;
 import rnd.puzzleapp.utils.Dialog;
@@ -28,19 +29,23 @@ public class PuzzleActivity extends AppCompatActivity {
 
         String puzzleName = getIntent().getStringExtra(PUZZLE_NAME_KEY);
         boolean isSolution = getIntent().getBooleanExtra(IS_SOLUTION_KEY, false);
-        Optional<StoredPuzzle> puzzle = StorageManager.load(this, puzzleName);
         puzzleView = findViewById(R.id.puzzleview);
 
         setTitle(String.format(isSolution ? "%s [solution]" : "%s", puzzleName));
 
+        // Ideally this loading would be done in an async task, but that would break the current
+        // PuzzleView.
+        Optional<StoredPuzzle> puzzle = StorageManager.load(this, puzzleName);
+
         if(!puzzle.isPresent()) {
-            // TODO: Handle error.
+            // If no puzzle is supplied, it will cause a crash, so provide a dummy puzzle.
+            puzzleView.setPuzzle(new Puzzle());
             Toast.makeText(this, "Could not load puzzle", Toast.LENGTH_SHORT).show();
         } else if(isSolution && !puzzle.get().getSolution().isPresent()) {
-            // TODO: Handle error.
+            // If no puzzle is supplied, it will cause a crash, so provide a dummy puzzle.
+            puzzleView.setPuzzle(new Puzzle());
             Toast.makeText(this, "Could not find solution", Toast.LENGTH_SHORT).show();
         } else {
-
             storedPuzzle = puzzle.get();
 
             puzzleView.setPuzzle(isSolution ? storedPuzzle.getSolution().get() : storedPuzzle.getPuzzle());
@@ -55,6 +60,9 @@ public class PuzzleActivity extends AppCompatActivity {
         super.onPause();
 
         if(storedPuzzle.isDirty()) {
+            // Not doing this in an async task as I want to make sure the puzzle is actually saved
+            // before this activity returns to avoid a potential race condition where the puzzle is
+            // being saved by this activity, while being loaded by the list puzzles activity.
             StorageManager.save(this, storedPuzzle);
         }
     }
