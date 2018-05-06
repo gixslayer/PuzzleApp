@@ -3,7 +3,6 @@ package rnd.puzzleapp;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -70,11 +69,10 @@ public class PuzzleView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
-        //Log.d("SIZE_CHANGED", String.format("w=%d h=%d oldw=%d oldh=%d gw=%d gh=%d", w, h, oldw, oldh, getWidth(), getHeight()));
-
         float minXScaleFactor = getWidth() / puzzleRenderer.getWidth();
         float minYScaleFactor = getHeight() / puzzleRenderer.getHeight();
         minScaleFactor = Math.min(minXScaleFactor, minYScaleFactor);
+        scaleFactor = Math.max(scaleFactor, minScaleFactor);
         minX = getWidth() - puzzleRenderer.getWidth() * scaleFactor;
         minY = getHeight() - puzzleRenderer.getHeight() * scaleFactor;
         padX = Math.max((getWidth() - puzzleRenderer.getWidth() * scaleFactor) / 2.0f, 0.0f);
@@ -113,8 +111,6 @@ public class PuzzleView extends View {
                 float y = event.getY(pointerIndex);
                 float dx = x - lastTouchX;
                 float dy = y - lastTouchY;
-
-                //Log.d("POS", String.format("X=%f Y=%f dX=%f dY=%f", posX, posY, dx, dy));
 
                 // Clamp x and y position to ensure the current viewport stays within the puzzle.
                 posX = Math.min(Math.max(posX + dx, minX), 0);
@@ -158,20 +154,14 @@ public class PuzzleView extends View {
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            //Log.d("SCALE", "" + detector.getScaleFactor());
+            float focusX = -posX + (detector.getFocusX() - padX);
+            float focusY = -posY + (detector.getFocusY() - padY);
+            float oldScaleFactor = scaleFactor;
 
             // Clamp the scale factor so that the user cannot zoom out further if the entire puzzle
             // is already visible.
             scaleFactor *= detector.getScaleFactor();
             scaleFactor = Math.max(scaleFactor, minScaleFactor);
-
-            // TODO: keep focus point in-place.
-            float focusX = posX + detector.getFocusX() - padX;
-            float focusY = posY + detector.getFocusY() - padY;
-            float newFocusX = focusX * scaleFactor;
-            float newFocusY = focusY * scaleFactor;
-            float dX = newFocusX - focusX;
-            float dY = newFocusY - focusX;
 
             // Compute drag bounds for the new scale factor.
             minX = getWidth() - puzzleRenderer.getWidth() * scaleFactor;
@@ -180,8 +170,15 @@ public class PuzzleView extends View {
             padX = Math.max((getWidth() - puzzleRenderer.getWidth() * scaleFactor) / 2.0f, 0.0f);
             padY = Math.max((getHeight() - puzzleRenderer.getHeight() * scaleFactor) / 2.0f, 0.0f);
 
-            //posX = Math.min(Math.max(posX + dX, minX), 0);
-            //posY = Math.min(Math.max(posY + dY, minY), 0);
+            // Try to keep focus point in place while zooming.
+            float newScale = scaleFactor / oldScaleFactor;
+            float newFocusX = focusX * newScale;
+            float newFocusY = focusY * newScale;
+            float newPosX = -(newFocusX - (detector.getFocusX() - padX));
+            float newPosY = -(newFocusY - (detector.getFocusY() * newScale - padY));
+
+            posX = Math.min(Math.max(newPosX, minX), 0);
+            posY = Math.min(Math.max(newPosY, minY), 0);
 
             invalidate();
 
@@ -199,8 +196,6 @@ public class PuzzleView extends View {
             int y = (int)((e.getY() - posY - padY) / scaleFactor / PuzzleRenderer.CELL_SIZE);
 
             puzzleController.onLongPress(x, y);
-
-            //Log.d("LONG", String.format("sx=%f sy=%f x=%d y=%d", e.getX(), e.getY(), x, y));
         }
 
         @Override
@@ -210,8 +205,6 @@ public class PuzzleView extends View {
             int y = (int)((e.getY() - posY - padY) / scaleFactor / PuzzleRenderer.CELL_SIZE);
 
             puzzleController.onSingleTap(x, y);
-
-            //Log.d("TAP", String.format("sx=%f sy=%f x=%d y=%d", e.getX(), e.getY(), x, y));
 
             return super.onSingleTapConfirmed(e);
         }
