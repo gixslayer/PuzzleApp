@@ -49,7 +49,7 @@ public class StorageManager {
     }
 
     private static boolean generate(Context context, PuzzleDifficulty difficulty, int i) {
-        long seed = ((long)difficulty.hashCode() << 32L) | i;
+        long seed = ((long)difficulty.getName().hashCode() << 32L) | i;
         PuzzleGenerator generator = new RandomPuzzleGenerator(seed, difficulty.getMinNodes(), difficulty.getMaxNodes());
         Puzzle solution = generator.generate(true);
         Puzzle puzzle = solution.copy();
