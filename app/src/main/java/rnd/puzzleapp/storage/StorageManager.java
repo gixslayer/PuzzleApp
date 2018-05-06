@@ -91,6 +91,12 @@ public class StorageManager {
         return ok;
     }
 
+    public static boolean puzzleExists(Context context, String name) {
+        File puzzlesPath = new File(context.getFilesDir(), PUZZLES_PATH);
+
+        return puzzlesPath.exists() && new File(puzzlesPath, name).exists();
+    }
+
     private static File getPuzzlesPath(Context context) {
         File puzzlesPath = new File(context.getFilesDir(), PUZZLES_PATH);
         if(!puzzlesPath.exists()) {
