@@ -16,6 +16,7 @@ import rnd.puzzleapp.puzzle.PuzzleGenerator;
 import rnd.puzzleapp.puzzle.RandomPuzzleGenerator;
 import rnd.puzzleapp.storage.StorageManager;
 import rnd.puzzleapp.storage.StoredPuzzle;
+import rnd.puzzleapp.utils.Threading;
 
 public class RandomPuzzleActivity extends Activity {
     private ImageView preview;
@@ -44,7 +45,8 @@ public class RandomPuzzleActivity extends Activity {
         generateButton.setOnClickListener(this::onGenerate);
         saveButton.setOnClickListener(this::onSave);
 
-        generate(4, 64, 0);
+        // Quickly generate a small bitmap as a placeholder.
+        Threading.async(() -> generate(2, 2, 0), preview::setImageBitmap);
     }
 
     private void onGenerate(View view) {
@@ -64,11 +66,13 @@ public class RandomPuzzleActivity extends Activity {
         } else if(max < min) {
             showToast("Maximum island count cannot be lower than minimum island count");
         } else {
-            generate(min, max, seed);
+            Threading.asyncProgressDialog(this, "Generating puzzle",
+                    () -> generate(min, max, seed),
+                    preview::setImageBitmap);
         }
     }
 
-    private void generate(int min, int max, int seed) {
+    private Bitmap generate(int min, int max, int seed) {
         PuzzleGenerator generator = new RandomPuzzleGenerator(seed, min, max);
         solution = generator.generate(true);
         puzzle = solution.copy();
@@ -76,7 +80,7 @@ public class RandomPuzzleActivity extends Activity {
         ThumbnailRenderer renderer = new ThumbnailRenderer(solution);
         thumbnail = renderer.drawLarge();
 
-        preview.setImageBitmap(thumbnail);
+        return thumbnail;
     }
 
     private void onSave(View view) {
@@ -87,17 +91,15 @@ public class RandomPuzzleActivity extends Activity {
         } else if(StorageManager.puzzleExists(this, name)) {
             showToast("A puzzle with this name already exists");
         } else {
-            save(name);
+            Threading.asyncProgressDialog(this, "Saving puzzle",
+                    () -> save(name),
+                    succeeded -> showToast(succeeded ? "Puzzle saved" : "Error while saving puzzle")
+            );
         }
     }
 
-    private void save(String name) {
-        StoredPuzzle storedPuzzle = StoredPuzzle.create(name, puzzle, solution, thumbnail);
-        if(StorageManager.save(this, storedPuzzle)) {
-            showToast("Puzzle saved");
-        } else {
-            showToast("Error while saving puzzle");
-        }
+    private boolean save(String name) {
+        return StorageManager.save(this, StoredPuzzle.create(name, puzzle, solution, null));
     }
 
     private void showToast(String text) {
