@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import rnd.puzzleapp.storage.StorageManager;
 import rnd.puzzleapp.storage.StoredPuzzle;
+import rnd.puzzleapp.utils.Dialog;
 
 public class PuzzleActivity extends AppCompatActivity {
     public static final String PUZZLE_NAME_KEY = "puzzle_name";
@@ -70,7 +71,10 @@ public class PuzzleActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.puzzle_option_reset:
-                resetPuzzle();
+                Dialog.showConfirmationDialog(this,
+                        "Reset puzzle",
+                        "Are you sure you want to reset this puzzle? This cannot be undone",
+                        this::resetPuzzle);
                 return true;
 
             case R.id.puzzle_option_help:

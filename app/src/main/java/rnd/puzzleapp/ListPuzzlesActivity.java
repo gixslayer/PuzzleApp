@@ -18,6 +18,7 @@ import rnd.puzzleapp.puzzle.Puzzle;
 import rnd.puzzleapp.puzzle.PuzzleStatus;
 import rnd.puzzleapp.storage.StorageManager;
 import rnd.puzzleapp.storage.StoredPuzzle;
+import rnd.puzzleapp.utils.Dialog;
 
 public class ListPuzzlesActivity extends AppCompatActivity {
     private PuzzleAdapter puzzleAdapter;
@@ -86,11 +87,17 @@ public class ListPuzzlesActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.list_puzzles_option_recreate:
-                recreatePuzzles();
+                Dialog.showConfirmationDialog(this,
+                        "Recreate all puzzles",
+                        "Are you sure you want to delete and recreate all puzzles? This cannot be undone, and removes all user created puzzles",
+                        this::recreatePuzzles);
                 return true;
 
             case R.id.list_puzzles_option_reset:
-                resetAllPuzzles();
+                Dialog.showConfirmationDialog(this,
+                        "Reset all puzzles",
+                        "Are you sure you want to reset all puzzles? This cannot be undone",
+                        this::resetAllPuzzles);
                 return true;
 
             case R.id.list_puzzles_option_random:
@@ -117,11 +124,17 @@ public class ListPuzzlesActivity extends AppCompatActivity {
                 return true;
 
             case R.id.list_puzzles_context_reset:
-                resetPuzzle(storedPuzzle);
+                Dialog.showConfirmationDialog(this,
+                        "Reset puzzle",
+                        "Are you sure you want to reset this puzzle? This cannot be undone",
+                        () -> resetPuzzle(storedPuzzle));
                 return true;
 
             case R.id.list_puzzles_context_delete:
-                deletePuzzle(storedPuzzle);
+                Dialog.showConfirmationDialog(this,
+                        "Delete puzzle",
+                        "Are you sure you want to delete this puzzle? This cannot be undone",
+                        () -> deletePuzzle(storedPuzzle));
                 return true;
 
             default:
