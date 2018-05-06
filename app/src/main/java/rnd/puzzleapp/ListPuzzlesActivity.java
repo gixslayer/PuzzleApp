@@ -85,6 +85,10 @@ public class ListPuzzlesActivity extends AppCompatActivity {
                 resetAllPuzzles();
                 return true;
 
+            case R.id.list_puzzles_option_random:
+                createRandomPuzzle();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -135,6 +139,12 @@ public class ListPuzzlesActivity extends AppCompatActivity {
         });
 
         gridView.invalidateViews();
+    }
+
+    private void createRandomPuzzle() {
+        Intent intent = new Intent(this, RandomPuzzleActivity.class);
+
+        startActivity(intent);
     }
 
     private void startPuzzle(StoredPuzzle puzzle) {
