@@ -1,6 +1,7 @@
 package rnd.puzzleapp.utils;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 
 public class Dialog {
@@ -17,5 +18,17 @@ public class Dialog {
                 .setPositiveButton(android.R.string.yes, (d, i) -> onYes.perform())
                 .setNegativeButton(android.R.string.no, (d, i) -> onNo.perform())
                 .show();
+    }
+
+    public static ProgressDialog showProgressDialog(Context context, String message) {
+        ProgressDialog dialog = new ProgressDialog(context);
+
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setMessage(message);
+        dialog.setIndeterminate(true);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+
+        return dialog;
     }
 }

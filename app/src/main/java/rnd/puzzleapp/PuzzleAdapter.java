@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,6 +17,10 @@ import rnd.puzzleapp.storage.StoredPuzzle;
 public class PuzzleAdapter extends BaseAdapter {
     private final Context context;
     private final List<StoredPuzzle> puzzles;
+
+    public PuzzleAdapter(Context context) {
+        this(context, new ArrayList<>());
+    }
 
     public PuzzleAdapter(Context context, List<StoredPuzzle> puzzles) {
         this.context = context;

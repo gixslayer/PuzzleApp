@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import java.util.List;
 import java.util.function.Predicate;
 
 import rnd.puzzleapp.puzzle.Puzzle;
@@ -19,6 +18,7 @@ import rnd.puzzleapp.puzzle.PuzzleStatus;
 import rnd.puzzleapp.storage.StorageManager;
 import rnd.puzzleapp.storage.StoredPuzzle;
 import rnd.puzzleapp.utils.Dialog;
+import rnd.puzzleapp.utils.Threading;
 
 public class ListPuzzlesActivity extends AppCompatActivity {
     private PuzzleAdapter puzzleAdapter;
@@ -31,38 +31,42 @@ public class ListPuzzlesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_puzzles);
 
-        if(StorageManager.shouldGeneratePuzzles(this)) {
-            StorageManager.generatePuzzles(this);
-        }
-
-        List<StoredPuzzle> storedPuzzles = StorageManager.load(this);
-        puzzleAdapter = new PuzzleAdapter(this, storedPuzzles);
         activePuzzle = null;
         generatingRandomPuzzle = false;
-
+        puzzleAdapter = new PuzzleAdapter(this);
         gridView = findViewById(R.id.grid_list_puzzles);
         gridView.setAdapter(puzzleAdapter);
         gridView.setOnItemClickListener((adapterView, view, i, l) -> startPuzzle(puzzleAdapter.getPuzzle(i)));
         registerForContextMenu(gridView);
+
+        if(StorageManager.shouldGeneratePuzzles(this)) {
+            generatePuzzles();
+        } else {
+            loadPuzzles();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        // If a user just returned from playing a puzzle, then update that puzzle.
         if(activePuzzle != null) {
-            StorageManager.load(this, activePuzzle).ifPresent(puzzle -> {
-                puzzleAdapter.update(puzzle);
-                gridView.invalidateViews();
-            });
+            // Make a copy that is passed to the async task, as activePuzzle might be set to null before
+            // the task runs, and cause a crash if passed directly.
+            String activePuzzleCopy = activePuzzle;
+
+            // If a user just returned from playing a puzzle, then update that puzzle.
+            Threading.asyncProgressDialog(this, "Loading puzzle",
+                    () -> StorageManager.load(this, activePuzzleCopy),
+                    storedPuzzle -> storedPuzzle.ifPresent(puzzle -> {
+                        puzzleAdapter.update(puzzle);
+                        gridView.invalidateViews();
+                    }));
 
             activePuzzle = null;
         } else if(generatingRandomPuzzle) {
             // If a user just returned from generating random puzzles, then reload the puzzle list.
-            puzzleAdapter.updateAll(StorageManager.load(this));
-            gridView.invalidateViews();
-
+            loadPuzzles();
             generatingRandomPuzzle = false;
         }
     }
@@ -143,23 +147,60 @@ public class ListPuzzlesActivity extends AppCompatActivity {
     }
 
     private void recreatePuzzles() {
-        StorageManager.deleteAll(this);
-        StorageManager.generatePuzzles(this);
+        Threading.asyncProgressDialog(this, "Deleting all puzzles",
+                () -> StorageManager.deleteAll(this),
+                this::generatePuzzles);
+    }
 
-        puzzleAdapter.updateAll(StorageManager.load(this));
-        gridView.invalidateViews();
+    private void generatePuzzles() {
+        Threading.asyncProgressDialog(this, "Generating puzzles",
+                () -> StorageManager.generatePuzzles(this),
+                this::loadPuzzles);
+    }
+
+    private void loadPuzzles() {
+        Threading.asyncProgressDialog(this, "Loading puzzles",
+                () -> StorageManager.load(this),
+                puzzles -> {
+                    puzzleAdapter.updateAll(puzzles);
+                    gridView.invalidateViews();
+                });
     }
 
     private void resetAllPuzzles() {
         Predicate<StoredPuzzle> isModified = sp -> sp.getPuzzle().getStatus() != PuzzleStatus.Untouched;
 
-        puzzleAdapter.getPuzzles().stream().filter(isModified).forEach(sp -> {
-            sp.getPuzzle().reset();
-            sp.markDirty();
-            StorageManager.save(this, sp);
-        });
+        Threading.asyncProgressDialog(this, "Resetting all puzzles",
+                () -> puzzleAdapter.getPuzzles().stream().filter(isModified).forEach(sp -> {
+                    sp.getPuzzle().reset();
+                    sp.markDirty();
+                    StorageManager.save(this, sp);
+                }),
+                gridView::invalidateViews);
+    }
 
-        gridView.invalidateViews();
+    private void resetPuzzle(StoredPuzzle storedPuzzle) {
+        Puzzle puzzle = storedPuzzle.getPuzzle();
+
+        if(puzzle.getStatus() != PuzzleStatus.Untouched) {
+            puzzle.reset();
+            storedPuzzle.markDirty();
+
+            Threading.asyncProgressDialog(this, "Saving puzzle",
+                    () -> StorageManager.save(this, storedPuzzle),
+                    () -> {
+                        puzzleAdapter.update(storedPuzzle);
+                        gridView.invalidateViews();
+                    });
+        }
+    }
+
+    private void deletePuzzle(StoredPuzzle puzzle) {
+        puzzleAdapter.remove(puzzle);
+
+        Threading.asyncProgressDialog(this, "Deleting puzzle",
+                () -> StorageManager.delete(this, puzzle),
+                gridView::invalidateViews);
     }
 
     private void createRandomPuzzle() {
@@ -197,24 +238,5 @@ public class ListPuzzlesActivity extends AppCompatActivity {
         } else {
             // TODO: Prompt for solver.
         }
-    }
-
-    private void resetPuzzle(StoredPuzzle storedPuzzle) {
-        Puzzle puzzle = storedPuzzle.getPuzzle();
-
-        if(puzzle.getStatus() != PuzzleStatus.Untouched) {
-            puzzle.reset();
-            storedPuzzle.markDirty();
-
-            StorageManager.save(this, storedPuzzle);
-            puzzleAdapter.update(storedPuzzle);
-            gridView.invalidateViews();
-        }
-    }
-
-    private void deletePuzzle(StoredPuzzle puzzle) {
-        puzzleAdapter.remove(puzzle);
-        StorageManager.delete(this, puzzle);
-        gridView.invalidateViews();
     }
 }
