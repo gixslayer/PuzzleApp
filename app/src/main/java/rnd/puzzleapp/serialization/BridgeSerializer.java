@@ -6,11 +6,14 @@ import java.io.IOException;
 
 import rnd.puzzleapp.puzzle.Bridge;
 
+/**
+ * Serializes {@link Bridge} instances to/from data streams.
+ */
 public class BridgeSerializer implements Serializer<Bridge> {
     public static final BridgeSerializer INSTANCE = new BridgeSerializer();
 
     private BridgeSerializer() {
-
+        // NOTE: Private constructor for the Singleton pattern.
     }
 
     @Override

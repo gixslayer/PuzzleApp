@@ -35,7 +35,7 @@ public class DFSSolver implements PuzzleSolver {
 
         for (Bridge move : possibleBridges) {
             Puzzle newPuzzle = puzzle.fastCopy();
-            newPuzzle.placeBridgeUnchecked(move);
+            newPuzzle.addBridge(move);
 
             if (!searchPath.contains(newPuzzle)) {
                 SolveResult result = expand(newPuzzle, possibleBridges);

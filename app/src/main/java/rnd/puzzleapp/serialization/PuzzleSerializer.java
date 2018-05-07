@@ -4,42 +4,30 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import rnd.puzzleapp.puzzle.Bridge;
-import rnd.puzzleapp.puzzle.Island;
 import rnd.puzzleapp.puzzle.Puzzle;
 
-import static rnd.puzzleapp.utils.Functional.repeatN;
-
+/**
+ * Serializes {@link Puzzle} instances to/from data streams.
+ */
 public class PuzzleSerializer implements Serializer<Puzzle> {
     public static final PuzzleSerializer INSTANCE = new PuzzleSerializer();
 
+    private PuzzleSerializer() {
+        // NOTE: Private constructor for the Singleton pattern.
+    }
+
     @Override
     public void serialize(DataOutputStream stream, Puzzle instance) throws IOException {
-        stream.writeInt(instance.getIslands().size());
-        for(Island island : instance.getIslands()) {
-            IslandSerializer.INSTANCE.serialize(stream, island);
-        }
-
-        stream.writeInt(instance.getBridges().size());
-        for(Bridge bridge : instance.getBridges()) {
-            BridgeSerializer.INSTANCE.serialize(stream, bridge);
-        }
+        IslandSerializer.INSTANCE.serializeCollection(stream, instance.getIslands());
+        BridgeSerializer.INSTANCE.serializeCollection(stream, instance.getBridges());
     }
 
     @Override
     public Puzzle deserialize(DataInputStream stream) throws IOException {
         Puzzle puzzle = new Puzzle();
 
-
-        int numIslands = stream.readInt();
-        for(int i = 0; i < numIslands; ++i) {
-            puzzle.getIslands().add(IslandSerializer.INSTANCE.deserialize(stream));
-        }
-
-        int numBridges = stream.readInt();
-        for(int i = 0; i < numBridges; ++i) {
-            puzzle.getBridges().add(BridgeSerializer.INSTANCE.deserialize(stream));
-        }
+        IslandSerializer.INSTANCE.deserializeCollection(stream).forEach(puzzle::addIsland);
+        BridgeSerializer.INSTANCE.deserializeCollection(stream).forEach(puzzle::addBridge);
 
         return puzzle;
     }

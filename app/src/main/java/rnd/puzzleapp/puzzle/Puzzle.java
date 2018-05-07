@@ -126,13 +126,27 @@ public class Puzzle implements Comparable<Puzzle> {
         return bridges.stream().filter(bridge::equals).count();
     }
 
+    public int getBridgeCount() {
+        return bridges.size();
+    }
+
+    public int getIslandCount() {
+        return islands.size();
+    }
+
     public boolean placeBridge(Bridge bridge) {
         return doIf(canPlaceBridge(bridge), () -> addSorted(bridges, bridge));
     }
 
-    public void placeBridgeUnchecked(Bridge bridge) {
+    public void addBridge(Bridge bridge) {
         // NOTE: This method is only intended for solvers in order to improve performance.
+        // NOTE: Also used for serialization.
         addSorted(bridges, bridge);
+    }
+
+    public void addIsland(Island island) {
+        // NOTE: Used for serialization.
+        addSorted(islands, island);
     }
 
     public boolean deleteBridge(Bridge bridge) {

@@ -6,11 +6,14 @@ import java.io.IOException;
 
 import rnd.puzzleapp.puzzle.Island;
 
+/**
+ * Serializes {@link Island} instances to/from data streams.
+ */
 public class IslandSerializer implements Serializer<Island> {
     public static final IslandSerializer INSTANCE = new IslandSerializer();
 
     private IslandSerializer() {
-
+        // NOTE: Private constructor for the Singleton pattern.
     }
 
     @Override

@@ -2,6 +2,7 @@ package rnd.puzzleapp.storage;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -16,6 +17,9 @@ import rnd.puzzleapp.puzzle.Puzzle;
 import rnd.puzzleapp.serialization.PuzzleSerializer;
 import rnd.puzzleapp.utils.FileSystem;
 
+/**
+ * Represents a puzzle that is stored on the local storage.
+ */
 public class StoredPuzzle {
     private static final String PUZZLE_NAME = "puzzle";
     private static final String SOLUTION_NAME = "solution";
@@ -37,31 +41,62 @@ public class StoredPuzzle {
         this.isThumbnailDirty = false;
     }
 
+    /**
+     * Returns the name of this stored puzzle.
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the puzzle of this stored puzzle.
+     * @return the puzzle
+     */
     public Puzzle getPuzzle() {
         return puzzle;
     }
 
+    /**
+     * Returns the solution of this stored puzzle, if one exists.
+     * @return the solution if one exists, or an empty optional otherwise
+     */
     public Optional<Puzzle> getSolution() {
         return Optional.ofNullable(solution);
     }
 
+    /**
+     * Returns the thumbnail of this stored puzzle. Note that this thumbnail will not reflect changes
+     * made to the puzzle until this stored puzzle is saved.
+     * @return the thumbnail
+     */
     public Bitmap getThumbnail() {
         return thumbnail;
     }
 
+    /**
+     * Checks if this stored puzzle is marked as dirty, meaning it contains unsaved changes.
+     * @return {@code true} if this stored puzzle is marked dirty, {@code false} otherwise.
+     */
     public boolean isDirty() {
         return isDirty;
     }
 
+    /**
+     * Marks this stored puzzle as dirty, meaning it contains unsaved changes.
+     */
     public void markDirty() {
         isDirty = true;
         isThumbnailDirty = true;
     }
 
+    /**
+     * Attempts to save this stored puzzle to the local storage. If required the thumbnail is rendered
+     * before writing it to local storage. If this stored puzzle is saved successfully, the dirty mark
+     * is cleared.
+     * @param path the directory to save the puzzle in
+     * @return {@code true} if the puzzle was saved successfully, {@code false} otherwise.
+     */
     public boolean save(File path) {
         File puzzlePath = new File(path, PUZZLE_NAME);
         File solutionPath = new File(path, SOLUTION_NAME);
@@ -84,6 +119,12 @@ public class StoredPuzzle {
         return saved;
     }
 
+    /**
+     * Attempts to load a stored puzzle from the local storage. If no stored thumbnail exists one is
+     * rendered from the loaded puzzle.
+     * @param path the directory to load the puzzle from
+     * @return the loaded puzzle, or an empty optional if the loading failed.
+     */
     public static Optional<StoredPuzzle> load(File path) {
         File puzzlePath = new File(path, PUZZLE_NAME);
         File solutionPath = new File(path, SOLUTION_NAME);
@@ -105,10 +146,16 @@ public class StoredPuzzle {
         return Optional.empty();
     }
 
-    public static StoredPuzzle create(String name, Puzzle puzzle, Puzzle solution, Bitmap thumbnail) {
-        if(puzzle == null) {
-            throw new IllegalArgumentException("puzzle cannot be null");
-        } else if(thumbnail == null) {
+    /**
+     * Creates a new stored puzzle.
+     * @param name the name of the puzzle, which must be a valid directory name
+     * @param puzzle the actual puzzle
+     * @param solution the solution of the puzzle if one exists, {@code null} otherwise
+     * @param thumbnail the current thumbnail of the puzzle, or {@code null} to create one
+     * @return the newly created instance, which is not yet saved to local storage.
+     */
+    public static StoredPuzzle create(String name, @NonNull Puzzle puzzle, Puzzle solution, Bitmap thumbnail) {
+        if(thumbnail == null) {
             thumbnail = renderThumbnail(puzzle);
         }
 

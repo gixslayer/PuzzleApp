@@ -34,7 +34,7 @@ public class BFSSolver implements PuzzleSolver {
 
             for(Bridge bridge : currentPuzzle.getPossibleBridges(possibleBridges)) {
                 Puzzle newPuzzle = currentPuzzle.fastCopy();
-                newPuzzle.placeBridgeUnchecked(bridge);
+                newPuzzle.addBridge(bridge);
                 PuzzleStatus status = newPuzzle.getStatus();
 
                 if(status == PuzzleStatus.Solved) {

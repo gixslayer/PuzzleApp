@@ -68,7 +68,7 @@ public class SmartSolver implements PuzzleSolver {
 
                 for (Bridge move : currentPuzzle.getPossibleBridges(currentPossibleMoves)) {
                     Puzzle newPuzzle = currentPuzzle.fastCopy();
-                    newPuzzle.placeBridgeUnchecked(move);
+                    newPuzzle.addBridge(move);
 
                     if (!searchSpaceSet.contains(newPuzzle)) {
                         searchSpace.add(newPuzzle);
