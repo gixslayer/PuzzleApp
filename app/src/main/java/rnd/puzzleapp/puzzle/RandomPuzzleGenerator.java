@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+/**
+ * A random {@link Puzzle} generator that generates solvable puzzles based on pseudo-random permutation.
+ */
 public class RandomPuzzleGenerator implements PuzzleGenerator {
     private static final float SUBDIVISION_BIAS = .50f;
     private static final float EDGE_ADDITION_BIAS = .75f;
@@ -21,6 +24,12 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
     private int maxX;
     private int maxY;
 
+    /**
+     * Creates a new random puzzle generator instance.
+     * @param seed the seed of the pseudo-random number generator
+     * @param minNodeCount the minimum amount of islands the puzzle should have (inclusive)
+     * @param maxNodeCount the maximum amount of islands the puzzle should have (inclusive)
+     */
     public RandomPuzzleGenerator(long seed, int minNodeCount, int maxNodeCount) {
         this.random = new Random(seed);
         this.targetNodeCount = randomInt(minNodeCount, maxNodeCount);
@@ -31,23 +40,50 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
         this.maxY = 0;
     }
 
+    /**
+     * Selects a random bridge from the current puzzle.
+     * @return the random bridge
+     */
     private Bridge selectRandomEdge() {
         return selectRandomListElement(puzzle.getBridges());
     }
 
+    /**
+     * Selects a random island from the current puzzle.
+     * @return the random island
+     */
     private Island selectRandomNode() {
         return selectRandomListElement(puzzle.getIslands());
     }
 
+    /**
+     * Utility method to select a random element from the given list.
+     * @param list the list to select an element from
+     * @param <T> the element type
+     * @return the randomly selected element
+     */
     private <T> T selectRandomListElement(List<T> list) {
         return list.get(random.nextInt(list.size()));
     }
 
+    /**
+     * Returns a random integer between the inclusive bounds
+     * @param min the lower bound
+     * @param max the upper bound
+     * @return the random integer
+     */
     private int randomInt(int min, int max) {
-        // NOTE: Both min/max are inclusive.
         return random.nextInt(max - min + 1) + min;
     }
 
+    /**
+     * Computes the horizontal bias for the current puzzle, which is a number between 0.0 and 1.0,
+     * where 0.0 indicates the next island should be attached vertically, 1.0 indicates the next
+     * island should be attached horizontally, and any number in between is uniformly biased, thus
+     * 0.5 indicates a 50-50/neutral bias. The aim of this bias is to generate puzzles that are
+     * roughly of a square shape.
+     * @return the horizontal bias
+     */
     private float horizontalBias() {
         float width = maxX - minX;
         float height = maxY - minY;
@@ -63,18 +99,16 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
     }
 
     private float negationBias(Island island, boolean horizontal) {
-        /// TODO: Bias node generation inwards.
-        /*if(horizontal) {
-            float width = maxX - minX;
-            return 0.5f - (width - island.getX()) / width;
-        } else {
-            float height = maxY - minY;
-            return 1.0f - (height - island.getY()) / height;
-        }*/
+        // TODO: Bias node generation towards the center of the puzzle if the island is on the edge of the puzzle.
 
         return 0.5f;
     }
 
+    /**
+     * Creates a new island that is randomly offset from the given island.
+     * @param node the island to offset from
+     * @return the offset island, which might not be in a valid location
+     */
     private Island randomOffset(Island node) {
         int offset = randomInt(MIN_NODE_OFFSET, MAX_NODE_OFFSET);
         boolean horizontalOffset = random.nextFloat() < horizontalBias();
@@ -86,6 +120,10 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
         return new Island(x, y, 0);
     }
 
+    /**
+     * Attempts to subdivide a bridge by placing an island in-between and connecting that island
+     * to the divided islands.
+     */
     private void subdivision() {
         Bridge edge = selectRandomEdge();
         Orientation orientation = edge.getOrientation();
@@ -117,6 +155,9 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
         }
     }
 
+    /**
+     * Attempts to double-up an existing bridge.
+     */
     private void edgeAddition() {
         Bridge edge = selectRandomEdge();
 
@@ -125,6 +166,9 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
         }
     }
 
+    /**
+     * Attempts to attach an island to an existing island.
+     */
     private void nodeAddition() {
         Island node = selectRandomNode();
         Island newNode = randomOffset(node);
@@ -137,6 +181,7 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
             puzzle.getIslands().add(newNode);
             puzzle.getBridges().add(newEdge);
 
+            // Update current puzzle bounds, which are not normalized.
             minX = Math.min(minX, newNode.getX());
             minY = Math.min(minY, newNode.getY());
             maxX = Math.max(maxX, newNode.getX());
@@ -144,6 +189,9 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
         }
     }
 
+    /**
+     * Perform the next permutation round, which might or might not end up adding a new island.
+     */
     private void nextRound() {
         float value = random.nextFloat() * BIAS_SUM;
 
@@ -156,10 +204,24 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
         }
     }
 
+    /**
+     * Normalizes the given island, based on the minimum x and y coordinates of the puzzle.
+     * @param node the island to normalize
+     * @param minX the minimum x coordinate
+     * @param minY the minimum y coordinate
+     * @return the normalized island
+     */
     private Island normalizeNode(Island node, int minX, int minY) {
         return new Island(node.getX() - minX, node.getY() - minY, node.getRequiredBridges());
     }
 
+    /**
+     * Normalizes the given bridge, based on the minimum x and y coordinates of the puzzle.
+     * @param edge the bridge to normalize
+     * @param minX the minimum x coordinate
+     * @param minY the minimum y coordinate
+     * @return the normalized bridge
+     */
     private Bridge normalizeEdge(Bridge edge, int minX, int minY) {
         return new Bridge(edge.getX1() - minX, edge.getY1() - minY, edge.getX2() - minX, edge.getY2() - minY);
     }

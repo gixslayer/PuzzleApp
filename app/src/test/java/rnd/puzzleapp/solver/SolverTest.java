@@ -72,7 +72,7 @@ public class SolverTest {
     @Test
     public void heuristicLarge() {
         PuzzleSolver solver = new HeuristicSolver();
-        Puzzle largePuzzle = generatePuzzle(2, 16);
+        Puzzle largePuzzle = generatePuzzle(1, 16);
 
         SolveResult result = solver.solve(largePuzzle);
 

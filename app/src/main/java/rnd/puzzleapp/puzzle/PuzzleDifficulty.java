@@ -1,5 +1,8 @@
 package rnd.puzzleapp.puzzle;
 
+/**
+ * The difficulty of a {@link Puzzle}.
+ */
 public enum PuzzleDifficulty {
     // NOTE: Should be declared in increasing order of difficulty for correct sorting.
     VeryEasy("Very easy", 4, 8),
@@ -18,14 +21,26 @@ public enum PuzzleDifficulty {
         this.maxNodes = maxNodes;
     }
 
+    /**
+     * Returns the name of this difficulty.
+     * @return the name, which is a valid directory name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the minimum amount of islands in this difficulty.
+     * @return the minimum amount of islands (inclusive)
+     */
     public int getMinNodes() {
         return minNodes;
     }
 
+    /**
+     * Returns the maximum amount of islands in this difficulty.
+     * @return the maximum amount of islands (inclusive)
+     */
     public int getMaxNodes() {
         return maxNodes;
     }
