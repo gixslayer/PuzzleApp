@@ -14,6 +14,9 @@ import rnd.puzzleapp.puzzle.Orientation;
 import rnd.puzzleapp.puzzle.Puzzle;
 import rnd.puzzleapp.puzzle.Span;
 
+/**
+ * Represents a class that renders a {@link Puzzle} to a {@link Canvas}.
+ */
 public class PuzzleRenderer {
     public static final float CELL_SIZE = 128;
     public static final float ISLAND_RADIUS = CELL_SIZE / 4;
@@ -57,19 +60,37 @@ public class PuzzleRenderer {
         this.selectedMode = PuzzleController.SelectionMode.place;
     }
 
+    /**
+     * Sets the selected islands that should be highlighted based on the selection mode.
+     * @param island the selected island
+     * @param mode the selection mode
+     */
     public void setSelectedIsland(Island island, PuzzleController.SelectionMode mode) {
         this.selectedIsland = island;
         this.selectedMode = mode;
     }
 
+    /**
+     * Returns the render width of the puzzle
+     * @return the width in pixels
+     */
     public float getWidth() {
         return width;
     }
 
+    /**
+     * Returns the render height of the puzzle
+     * @return the height in pixels
+     */
     public float getHeight() {
         return height;
     }
 
+    /**
+     * Renders the puzzle to the given {@code canvas}.
+     * @param canvas the canvas to render to, which is expected to the have the correct dimensions
+     *               as returned by {@link PuzzleRenderer#getWidth()} and {@link PuzzleRenderer#getHeight()}
+     */
     public void draw(Canvas canvas) {
         this.canvas = canvas;
 

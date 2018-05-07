@@ -5,16 +5,17 @@ import android.graphics.Canvas;
 
 import rnd.puzzleapp.puzzle.Puzzle;
 
+/**
+ * Represents a class that renders a thumbnail for a {@link Puzzle}.
+ */
 public class ThumbnailRenderer {
     public static final int THUMBNAIL_SIZE = 400;
     public static final int THUMBNAIL_LARGE_SIZE = 800;
 
     private final PuzzleRenderer puzzleRenderer;
-    private final Puzzle puzzle;
 
     public ThumbnailRenderer(Puzzle puzzle) {
         this.puzzleRenderer = new PuzzleRenderer(puzzle);
-        this.puzzle = puzzle;
     }
 
     private Bitmap drawPaddedBitmap() {
@@ -36,14 +37,28 @@ public class ThumbnailRenderer {
         return bitmap;
     }
 
+    /**
+     * Renders a normal sized thumbnail for the puzzle.
+     * @return the rendered thumbnail
+     */
     public Bitmap draw() {
         return draw(THUMBNAIL_SIZE);
     }
 
+    /**
+     * Renders a large thumbnail for the puzzle.
+     * @return the rendered thumbnail
+     */
     public Bitmap drawLarge() {
         return draw(THUMBNAIL_LARGE_SIZE);
     }
 
+    /**
+     * Renders a thumbnail for the puzzle.
+     * @param size the size in pixels of the thumbnail, the thumbnail is padded and centered if needed
+     *             to create a square thumbnail
+     * @return the rendered thumbnail
+     */
     public Bitmap draw(int size) {
         Bitmap bitmap = drawPaddedBitmap();
 
