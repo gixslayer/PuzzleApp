@@ -6,21 +6,29 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class RandomPuzzleGenerator implements PuzzleGenerator {
-    private static final float SUBDIVISION_BIAS = .75f;
-    private static final float EDGE_ADDITION_BIAS = .25f;
+    private static final float SUBDIVISION_BIAS = .50f;
+    private static final float EDGE_ADDITION_BIAS = .75f;
     private static final float NODE_ADDITION_BIAS = 2;
     private static final float BIAS_SUM = SUBDIVISION_BIAS + EDGE_ADDITION_BIAS + NODE_ADDITION_BIAS;
     private static final int MIN_NODE_OFFSET = 1;
-    private static final int MAX_NODE_OFFSET = 8;
+    private static final int MAX_NODE_OFFSET = 4;
 
     private final Random random;
     private final int targetNodeCount;
     private final Puzzle puzzle;
+    private int minX;
+    private int minY;
+    private int maxX;
+    private int maxY;
 
     public RandomPuzzleGenerator(long seed, int minNodeCount, int maxNodeCount) {
         this.random = new Random(seed);
         this.targetNodeCount = randomInt(minNodeCount, maxNodeCount);
         this.puzzle = new Puzzle();
+        this.minX = 0;
+        this.minY = 0;
+        this.maxX = 0;
+        this.maxY = 0;
     }
 
     private Bridge selectRandomEdge() {
@@ -40,11 +48,38 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
         return random.nextInt(max - min + 1) + min;
     }
 
+    private float horizontalBias() {
+        float width = maxX - minX;
+        float height = maxY - minY;
+        float bias = 0.5f;
+
+        if(width > height) {
+            bias -= (width - height) / width * 0.5f;
+        } else if(width < height) {
+            bias += (height - width) / height * 0.5f;
+        }
+
+        return bias;
+    }
+
+    private float negationBias(Island island, boolean horizontal) {
+        /// TODO: Bias node generation inwards.
+        /*if(horizontal) {
+            float width = maxX - minX;
+            return 0.5f - (width - island.getX()) / width;
+        } else {
+            float height = maxY - minY;
+            return 1.0f - (height - island.getY()) / height;
+        }*/
+
+        return 0.5f;
+    }
+
     private Island randomOffset(Island node) {
-        // TODO: Some bias to generate favourable shapes?
         int offset = randomInt(MIN_NODE_OFFSET, MAX_NODE_OFFSET);
-        offset = random.nextBoolean() ? -offset : offset;
-        boolean horizontalOffset = random.nextBoolean();
+        boolean horizontalOffset = random.nextFloat() < horizontalBias();
+        boolean negateOffset = random.nextFloat() < negationBias(node, horizontalOffset);
+        offset = negateOffset ? -offset : offset;
         int x = horizontalOffset ? node.getX() + offset : node.getX();
         int y = horizontalOffset ? node.getY() : node.getY() + offset;
 
@@ -101,6 +136,11 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
                 && puzzle.getIslands().stream().noneMatch(newEdge::crosses)) {
             puzzle.getIslands().add(newNode);
             puzzle.getBridges().add(newEdge);
+
+            minX = Math.min(minX, newNode.getX());
+            minY = Math.min(minY, newNode.getY());
+            maxX = Math.max(maxX, newNode.getX());
+            maxY = Math.max(maxY, newNode.getY());
         }
     }
 
@@ -127,7 +167,7 @@ public class RandomPuzzleGenerator implements PuzzleGenerator {
     @Override
     public Puzzle generate(boolean keepBridges) {
         // Add 2 initial connected nodes.
-        Island initialNode = new Island(0, 0, 0);
+        Island initialNode = new Island(minX, minY, 0);
         puzzle.getIslands().add(initialNode);
         nodeAddition();
 
