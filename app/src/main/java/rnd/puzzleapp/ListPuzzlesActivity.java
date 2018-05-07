@@ -21,6 +21,9 @@ import rnd.puzzleapp.storage.StoredPuzzle;
 import rnd.puzzleapp.utils.Dialog;
 import rnd.puzzleapp.utils.Threading;
 
+/**
+ * The main activity that lists all stored puzzles.
+ */
 public class ListPuzzlesActivity extends AppCompatActivity {
     private PuzzleAdapter puzzleAdapter;
     private String activePuzzle;
@@ -147,18 +150,28 @@ public class ListPuzzlesActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Delete all puzzles in an async task, then generate default puzzles upon completion.
+     */
     private void recreatePuzzles() {
         Threading.asyncProgressDialog(this, getString(R.string.deleting_all_puzzles),
                 () -> StorageManager.deleteAll(this),
                 this::generatePuzzles);
     }
 
+    /**
+     * Generate all default puzzles in an async task, then load all puzzles upon completion.
+     */
     private void generatePuzzles() {
         Threading.asyncProgressDialog(this, getString(R.string.generating_puzzles),
                 () -> StorageManager.generatePuzzles(this),
                 this::loadPuzzles);
     }
 
+    /**
+     * Load all puzzles from local storage in an async task, then populate view with loaded puzzles
+     * upon completion.
+     */
     private void loadPuzzles() {
         Threading.asyncProgressDialog(this, getString(R.string.loading_puzzles),
                 () -> StorageManager.load(this),
@@ -168,6 +181,9 @@ public class ListPuzzlesActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Reset all modified puzzles.
+     */
     private void resetAllPuzzles() {
         Predicate<StoredPuzzle> isModified = sp -> sp.getPuzzle().getStatus() != PuzzleStatus.Untouched;
 
@@ -180,6 +196,10 @@ public class ListPuzzlesActivity extends AppCompatActivity {
                 gridView::invalidateViews);
     }
 
+    /**
+     * Reset the given puzzle in an async task, and update the view upon completion.
+     * @param storedPuzzle the puzzle to reset
+     */
     private void resetPuzzle(StoredPuzzle storedPuzzle) {
         Puzzle puzzle = storedPuzzle.getPuzzle();
 
@@ -196,6 +216,10 @@ public class ListPuzzlesActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Delete the given puzzle in an async task, and update the view upon completion.
+     * @param puzzle the puzzle to delete
+     */
     private void deletePuzzle(StoredPuzzle puzzle) {
         puzzleAdapter.remove(puzzle);
 
@@ -204,6 +228,9 @@ public class ListPuzzlesActivity extends AppCompatActivity {
                 gridView::invalidateViews);
     }
 
+    /**
+     * Start the random puzzle creator activity.
+     */
     private void createRandomPuzzle() {
         // Would really prefer to use a navigation drawer, but don't have the time to rewrite everything into fragments.
         activePuzzle = null;
@@ -213,6 +240,10 @@ public class ListPuzzlesActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * Start the puzzle activity with the given puzzle.
+     * @param puzzle the puzzle to play
+     */
     private void startPuzzle(StoredPuzzle puzzle) {
         activePuzzle = puzzle.getName();
         generatingRandomPuzzle = false;
@@ -223,6 +254,10 @@ public class ListPuzzlesActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * Start the puzzle activity with the given solution.
+     * @param puzzle the solution to view
+     */
     private void startSolution(StoredPuzzle puzzle) {
         activePuzzle = null;
         generatingRandomPuzzle = false;
@@ -233,6 +268,10 @@ public class ListPuzzlesActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * View the solution to the given puzzle if one exists, or prompt to try and solve the puzzle otherwise.
+     * @param puzzle the puzzle to view/create a solution of/for
+     */
     private void viewOrCreateSolution(StoredPuzzle puzzle) {
         if(puzzle.getSolution().isPresent()) {
             startSolution(puzzle);

@@ -14,14 +14,26 @@ import java.util.List;
 
 import rnd.puzzleapp.storage.StoredPuzzle;
 
+/**
+ * A simple adapter to populate a {@link android.widget.GridView} with puzzle instances.
+ */
 public class PuzzleAdapter extends BaseAdapter {
     private final Context context;
     private final List<StoredPuzzle> puzzles;
 
+    /**
+     * Creates a new adapter without any puzzles.
+     * @param context the context of this adapter
+     */
     public PuzzleAdapter(Context context) {
         this(context, new ArrayList<>());
     }
 
+    /**
+     * Creates a new adapter with the given list of puzzles.
+     * @param context the context of this adapter
+     * @param puzzles the list of puzzles
+     */
     public PuzzleAdapter(Context context, List<StoredPuzzle> puzzles) {
         this.context = context;
         this.puzzles = puzzles;
@@ -29,18 +41,30 @@ public class PuzzleAdapter extends BaseAdapter {
         sortPuzzles();
     }
 
+    /**
+     * Updates or adds the given puzzle.
+     * @param puzzle the puzzle to update
+     */
     public void update(StoredPuzzle puzzle) {
         remove(puzzle);
         puzzles.add(puzzle);
         sortPuzzles();
     }
 
+    /**
+     * Replaces all puzzles in this adapter with the given puzzles.
+     * @param newPuzzles the new puzzles this adapter should contain
+     */
     public void updateAll(Collection<StoredPuzzle> newPuzzles) {
         puzzles.clear();
         puzzles.addAll(newPuzzles);
         sortPuzzles();
     }
 
+    /**
+     * Remove all occurrences of the given puzzle.
+     * @param puzzle the puzzle to remove
+     */
     public void remove(StoredPuzzle puzzle) {
         puzzles.removeIf(p -> p.getName().equals(puzzle.getName()));
     }
@@ -55,10 +79,19 @@ public class PuzzleAdapter extends BaseAdapter {
         return getPuzzle(i);
     }
 
+    /**
+     * Get the puzzle at the given position.
+     * @param i the position
+     * @return the puzzle at that position
+     */
     public StoredPuzzle getPuzzle(int i) {
         return puzzles.get(i);
     }
 
+    /**
+     * Returns the list of puzzles in this adapter.
+     * @return the list of puzzles
+     */
     public List<StoredPuzzle> getPuzzles() {
         return puzzles;
     }
@@ -89,6 +122,9 @@ public class PuzzleAdapter extends BaseAdapter {
         return gridItemView;
     }
 
+    /**
+     * Sort the puzzles based on incremental difficulty.
+     */
     private void sortPuzzles() {
         puzzles.sort(PuzzleComparator.INSTANCE);
     }

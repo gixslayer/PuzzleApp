@@ -14,6 +14,9 @@ import rnd.puzzleapp.storage.StorageManager;
 import rnd.puzzleapp.storage.StoredPuzzle;
 import rnd.puzzleapp.utils.Dialog;
 
+/**
+ * An activity in which the puzzle is played.
+ */
 public class PuzzleActivity extends AppCompatActivity {
     public static final String PUZZLE_NAME_KEY = "puzzle_name";
     public static final String IS_SOLUTION_KEY = "is_solution";

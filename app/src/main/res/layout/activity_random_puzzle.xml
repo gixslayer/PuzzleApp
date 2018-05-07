@@ -19,7 +19,7 @@
         android:id="@+id/generate_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Generate"
+        android:text="@string/generate"
         app:layout_constraintTop_toBottomOf="@id/puzzle_preview"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@id/save_button"/>
@@ -28,7 +28,7 @@
         android:id="@+id/save_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Save"
+        android:text="@string/save"
         app:layout_constraintTop_toBottomOf="@id/puzzle_preview"
         app:layout_constraintLeft_toRightOf="@id/generate_button"
         app:layout_constraintRight_toRightOf="parent"/>
@@ -38,7 +38,7 @@
         android:labelFor="@id/puzzle_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Name"
+        android:text="@string/name"
         android:textSize="24sp"
         app:layout_constraintTop_toBottomOf="@id/generate_button"
         app:layout_constraintLeft_toLeftOf="parent"/>
@@ -58,7 +58,7 @@
         android:labelFor="@id/min_islands"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Minimum islands"
+        android:text="@string/minimum_islands"
         android:textSize="24sp"
         app:layout_constraintTop_toBottomOf="@id/puzzle_name"
         app:layout_constraintLeft_toLeftOf="parent"/>
@@ -79,7 +79,7 @@
         android:labelFor="@id/max_islands"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Maximum islands"
+        android:text="@string/maximum_islands"
         android:textSize="24sp"
         app:layout_constraintTop_toBottomOf="@id/min_islands"
         app:layout_constraintLeft_toLeftOf="parent"/>
@@ -100,7 +100,7 @@
         android:labelFor="@id/seed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Custom seed (optional)"
+        android:text="@string/custom_seed_optional"
         android:textSize="24sp"
         app:layout_constraintTop_toBottomOf="@id/max_islands"
         app:layout_constraintLeft_toLeftOf="parent"/>

@@ -18,6 +18,9 @@ import rnd.puzzleapp.storage.StorageManager;
 import rnd.puzzleapp.storage.StoredPuzzle;
 import rnd.puzzleapp.utils.Threading;
 
+/**
+ * An activity to generate random puzzles.
+ */
 public class RandomPuzzleActivity extends Activity {
     private ImageView preview;
     private EditText puzzleName;
@@ -49,6 +52,9 @@ public class RandomPuzzleActivity extends Activity {
         Threading.async(() -> generate(2, 2, 0), preview::setImageBitmap);
     }
 
+    /**
+     * Invoked when the user clicked the generate button.
+     */
     private void onGenerate(View view) {
         String minString = minIslands.getText().toString();
         String maxString = maxIslands.getText().toString();
@@ -72,6 +78,13 @@ public class RandomPuzzleActivity extends Activity {
         }
     }
 
+    /**
+     * Generate a new random puzzle.
+     * @param min the minimum island count
+     * @param max the maximum island count
+     * @param seed the seed
+     * @return a large thumbnail of the generated puzzle
+     */
     private Bitmap generate(int min, int max, int seed) {
         PuzzleGenerator generator = new RandomPuzzleGenerator(seed, min, max);
         solution = generator.generate(true);
@@ -83,6 +96,9 @@ public class RandomPuzzleActivity extends Activity {
         return thumbnail;
     }
 
+    /**
+     * Invoked when the user clicked the save button.
+     */
     private void onSave(View view) {
         String name = puzzleName.getText().toString();
 
@@ -101,10 +117,19 @@ public class RandomPuzzleActivity extends Activity {
         }
     }
 
+    /**
+     * Attempts to save the randomly generated puzzle.
+     * @param name the name to save the puzzle under
+     * @return {@code true} if the puzzle was saved successfully, {@code false} otherwise
+     */
     private boolean save(String name) {
         return StorageManager.save(this, StoredPuzzle.create(name, puzzle, solution, null));
     }
 
+    /**
+     * Shows a toast with the given message.
+     * @param text the message of the toast
+     */
     private void showToast(String text) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }

@@ -7,6 +7,9 @@ import java.util.Map;
 import rnd.puzzleapp.puzzle.PuzzleDifficulty;
 import rnd.puzzleapp.storage.StoredPuzzle;
 
+/**
+ * Comparator that sorts puzzles based on incremental difficulty.
+ */
 public class PuzzleComparator implements Comparator<StoredPuzzle> {
     public static final PuzzleComparator INSTANCE = new PuzzleComparator();
 
@@ -36,6 +39,11 @@ public class PuzzleComparator implements Comparator<StoredPuzzle> {
         }
     }
 
+    /**
+     * Returns the difficulty category of a puzzle based on the given name.
+     * @param name the name of the puzzle
+     * @return a non-negative number that represents the incremental difficulty category
+     */
     private int getDifficulty(String name) {
         for(Map.Entry<String, Integer> entry : difficultyMapping.entrySet()) {
             if(name.startsWith(entry.getKey())) {

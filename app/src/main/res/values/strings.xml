@@ -28,4 +28,19 @@
     <string name="puzzle_already_exists">A puzzle with this name already exists</string>
     <string name="puzzle_saved">Puzzle saved</string>
     <string name="error_saving_puzzle">Error while saving puzzle</string>
+    <string name="title">Title</string>
+    <string name="state">State</string>
+    <string name="generate">Generate</string>
+    <string name="save">Save</string>
+    <string name="name">Name</string>
+    <string name="minimum_islands">Minimum islands</string>
+    <string name="maximum_islands">Maximum islands</string>
+    <string name="custom_seed_optional">Custom seed (optional)</string>
+    <string name="reset">Reset</string>
+    <string name="help">Help</string>
+    <string name="recreate_puzzles">Recreate puzzles</string>
+    <string name="create_random_puzzle">Create random puzzle</string>
+    <string name="play">Play</string>
+    <string name="view_create_solution">View/create solution</string>
+    <string name="delete">Delete</string>
 </resources>

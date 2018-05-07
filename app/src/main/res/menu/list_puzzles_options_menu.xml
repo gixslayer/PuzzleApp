@@ -2,11 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/list_puzzles_option_recreate"
-        android:title="Recreate puzzles" />
+        android:title="@string/recreate_puzzles" />
     <item
         android:id="@+id/list_puzzles_option_reset"
-        android:title="Reset all puzzles" />
+        android:title="@string/reset_all_puzzles" />
     <item
         android:id="@+id/list_puzzles_option_random"
-        android:title="Create random puzzle" />
+        android:title="@string/create_random_puzzle" />
 </menu>

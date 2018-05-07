@@ -2,14 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/list_puzzles_context_play"
-        android:title="Play" />
+        android:title="@string/play" />
     <item
         android:id="@+id/list_puzzles_context_solution"
-        android:title="View/create solution" />
+        android:title="@string/view_create_solution" />
     <item
         android:id="@+id/list_puzzles_context_reset"
-        android:title="Reset" />
+        android:title="@string/reset" />
     <item
         android:id="@+id/list_puzzles_context_delete"
-        android:title="Delete" />
+        android:title="@string/delete" />
 </menu>

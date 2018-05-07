@@ -15,6 +15,9 @@ import rnd.puzzleapp.puzzle.PuzzleStatus;
 
 import static android.view.MotionEvent.INVALID_POINTER_ID;
 
+/**
+ * A view that displays a {@link Puzzle} and handles input events.
+ */
 public class PuzzleView extends View {
     private final ScaleGestureDetector scaleGestureDetector;
     private final GestureDetector gestureDetector;
@@ -44,6 +47,10 @@ public class PuzzleView extends View {
         this.padY = 0.0f;
     }
 
+    /**
+     * Sets the puzzle of this view.
+     * @param puzzle the puzzle
+     */
     public void setPuzzle(Puzzle puzzle) {
         this.puzzleRenderer = new PuzzleRenderer(puzzle);
         this.puzzleController = new PuzzleController(puzzle);
@@ -53,6 +60,10 @@ public class PuzzleView extends View {
         puzzleController.setOnSelectionChangedListener((island, mode) -> invalidate());
     }
 
+    /**
+     * Returns the controller attached to the puzzle of this view.
+     * @return the controller
+     */
     public PuzzleController getPuzzleController() {
         return puzzleController;
     }
