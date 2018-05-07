@@ -1,3 +1,31 @@
 <resources>
     <string name="app_name">PuzzleApp</string>
+    <string name="loading_puzzle">Loading puzzle</string>
+    <string name="recreate_all_puzzles">Recreate all puzzles</string>
+    <string name="recreate_all_puzzles_message">Are you sure you want to delete and recreate all puzzles? This cannot be undone, and removes all user created puzzles</string>
+    <string name="reset_all_puzzles">Reset all puzzles</string>
+    <string name="reset_all_puzzles_message">Are you sure you want to reset all puzzles? This cannot be undone</string>
+    <string name="reset_puzzle">Reset puzzle</string>
+    <string name="reset_puzzle_message">Are you sure you want to reset this puzzle? This cannot be undone</string>
+    <string name="delete_puzzle">Delete puzzle</string>
+    <string name="delete_puzzle_message">Are you sure you want to delete this puzzle? This cannot be undone</string>
+    <string name="deleting_all_puzzles">Deleting all puzzles</string>
+    <string name="generating_puzzles">Generating puzzles</string>
+    <string name="loading_puzzles">Loading puzzles</string>
+    <string name="resetting_all_puzzles">Resetting all puzzles</string>
+    <string name="saving_puzzle">Saving puzzle</string>
+    <string name="deleting_puzzle">Deleting puzzle</string>
+    <string name="solution_could_not_be_found">Solution could not be found</string>
+    <string name="could_not_load_puzzle">Could not load puzzle</string>
+    <string name="could_not_find_solution">Could not find solution</string>
+    <string name="puzzle_solved">Puzzle solved!</string>
+    <string name="enter_min_island_count">Please enter a minimum island count</string>
+    <string name="enter_max_island_count">Please enter a maximum island count</string>
+    <string name="min_island_count_must_be_2">Minimum island count must be at least 2</string>
+    <string name="max_island_count_cannot_be_below_min">Maximum island count cannot be lower than minimum island count</string>
+    <string name="generating_puzzle">Generating puzzle</string>
+    <string name="enter_puzzle_name">Please enter a puzzle name</string>
+    <string name="puzzle_already_exists">A puzzle with this name already exists</string>
+    <string name="puzzle_saved">Puzzle saved</string>
+    <string name="error_saving_puzzle">Error while saving puzzle</string>
 </resources>

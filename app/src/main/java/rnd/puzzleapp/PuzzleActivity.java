@@ -40,11 +40,11 @@ public class PuzzleActivity extends AppCompatActivity {
         if(!puzzle.isPresent()) {
             // If no puzzle is supplied, it will cause a crash, so provide a dummy puzzle.
             puzzleView.setPuzzle(new Puzzle());
-            Toast.makeText(this, "Could not load puzzle", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.could_not_load_puzzle, Toast.LENGTH_SHORT).show();
         } else if(isSolution && !puzzle.get().getSolution().isPresent()) {
             // If no puzzle is supplied, it will cause a crash, so provide a dummy puzzle.
             puzzleView.setPuzzle(new Puzzle());
-            Toast.makeText(this, "Could not find solution", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.could_not_find_solution, Toast.LENGTH_SHORT).show();
         } else {
             storedPuzzle = puzzle.get();
 
@@ -80,8 +80,8 @@ public class PuzzleActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.puzzle_option_reset:
                 Dialog.showConfirmationDialog(this,
-                        "Reset puzzle",
-                        "Are you sure you want to reset this puzzle? This cannot be undone",
+                        getString(R.string.reset_puzzle),
+                        getString(R.string.reset_puzzle_message),
                         this::resetPuzzle);
                 return true;
 

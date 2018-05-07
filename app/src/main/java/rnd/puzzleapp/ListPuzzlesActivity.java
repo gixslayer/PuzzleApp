@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import java.util.function.Predicate;
 
@@ -56,7 +57,7 @@ public class ListPuzzlesActivity extends AppCompatActivity {
             String activePuzzleCopy = activePuzzle;
 
             // If a user just returned from playing a puzzle, then update that puzzle.
-            Threading.asyncProgressDialog(this, "Loading puzzle",
+            Threading.asyncProgressDialog(this, getString(R.string.loading_puzzle),
                     () -> StorageManager.load(this, activePuzzleCopy),
                     storedPuzzle -> storedPuzzle.ifPresent(puzzle -> {
                         puzzleAdapter.update(puzzle);
@@ -92,15 +93,15 @@ public class ListPuzzlesActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.list_puzzles_option_recreate:
                 Dialog.showConfirmationDialog(this,
-                        "Recreate all puzzles",
-                        "Are you sure you want to delete and recreate all puzzles? This cannot be undone, and removes all user created puzzles",
+                        getString(R.string.recreate_all_puzzles),
+                        getString(R.string.recreate_all_puzzles_message),
                         this::recreatePuzzles);
                 return true;
 
             case R.id.list_puzzles_option_reset:
                 Dialog.showConfirmationDialog(this,
-                        "Reset all puzzles",
-                        "Are you sure you want to reset all puzzles? This cannot be undone",
+                        getString(R.string.reset_all_puzzles),
+                        getString(R.string.reset_all_puzzles_message),
                         this::resetAllPuzzles);
                 return true;
 
@@ -129,15 +130,15 @@ public class ListPuzzlesActivity extends AppCompatActivity {
 
             case R.id.list_puzzles_context_reset:
                 Dialog.showConfirmationDialog(this,
-                        "Reset puzzle",
-                        "Are you sure you want to reset this puzzle? This cannot be undone",
+                        getString(R.string.reset_puzzle),
+                        getString(R.string.reset_puzzle_message),
                         () -> resetPuzzle(storedPuzzle));
                 return true;
 
             case R.id.list_puzzles_context_delete:
                 Dialog.showConfirmationDialog(this,
-                        "Delete puzzle",
-                        "Are you sure you want to delete this puzzle? This cannot be undone",
+                        getString(R.string.delete_puzzle),
+                        getString(R.string.delete_puzzle_message),
                         () -> deletePuzzle(storedPuzzle));
                 return true;
 
@@ -147,19 +148,19 @@ public class ListPuzzlesActivity extends AppCompatActivity {
     }
 
     private void recreatePuzzles() {
-        Threading.asyncProgressDialog(this, "Deleting all puzzles",
+        Threading.asyncProgressDialog(this, getString(R.string.deleting_all_puzzles),
                 () -> StorageManager.deleteAll(this),
                 this::generatePuzzles);
     }
 
     private void generatePuzzles() {
-        Threading.asyncProgressDialog(this, "Generating puzzles",
+        Threading.asyncProgressDialog(this, getString(R.string.generating_puzzles),
                 () -> StorageManager.generatePuzzles(this),
                 this::loadPuzzles);
     }
 
     private void loadPuzzles() {
-        Threading.asyncProgressDialog(this, "Loading puzzles",
+        Threading.asyncProgressDialog(this, getString(R.string.loading_puzzles),
                 () -> StorageManager.load(this),
                 puzzles -> {
                     puzzleAdapter.updateAll(puzzles);
@@ -170,7 +171,7 @@ public class ListPuzzlesActivity extends AppCompatActivity {
     private void resetAllPuzzles() {
         Predicate<StoredPuzzle> isModified = sp -> sp.getPuzzle().getStatus() != PuzzleStatus.Untouched;
 
-        Threading.asyncProgressDialog(this, "Resetting all puzzles",
+        Threading.asyncProgressDialog(this, getString(R.string.resetting_all_puzzles),
                 () -> puzzleAdapter.getPuzzles().stream().filter(isModified).forEach(sp -> {
                     sp.getPuzzle().reset();
                     sp.markDirty();
@@ -186,7 +187,7 @@ public class ListPuzzlesActivity extends AppCompatActivity {
             puzzle.reset();
             storedPuzzle.markDirty();
 
-            Threading.asyncProgressDialog(this, "Saving puzzle",
+            Threading.asyncProgressDialog(this, getString(R.string.saving_puzzle),
                     () -> StorageManager.save(this, storedPuzzle),
                     () -> {
                         puzzleAdapter.update(storedPuzzle);
@@ -198,7 +199,7 @@ public class ListPuzzlesActivity extends AppCompatActivity {
     private void deletePuzzle(StoredPuzzle puzzle) {
         puzzleAdapter.remove(puzzle);
 
-        Threading.asyncProgressDialog(this, "Deleting puzzle",
+        Threading.asyncProgressDialog(this, getString(R.string.deleting_puzzle),
                 () -> StorageManager.delete(this, puzzle),
                 gridView::invalidateViews);
     }
@@ -237,6 +238,7 @@ public class ListPuzzlesActivity extends AppCompatActivity {
             startSolution(puzzle);
         } else {
             // TODO: Prompt for solver.
+            Toast.makeText(this, R.string.solution_could_not_be_found, Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -61,7 +61,7 @@ public class PuzzleView extends View {
         invalidate();
 
         if(puzzle.getStatus() == PuzzleStatus.Solved) {
-            Toast.makeText(getContext(), "Puzzle solved!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.puzzle_solved, Toast.LENGTH_SHORT).show();
         }
     }
 

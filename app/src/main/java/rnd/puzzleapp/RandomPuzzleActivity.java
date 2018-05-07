@@ -58,15 +58,15 @@ public class RandomPuzzleActivity extends Activity {
         int seed = seedString.isEmpty() ? incrementalSeed++ : Integer.parseInt(seedString);
 
         if(min == Integer.MIN_VALUE) {
-            showToast("Please enter a minimum island count");
+            showToast(getString(R.string.enter_min_island_count));
         } else if(max == Integer.MIN_VALUE) {
-            showToast("Please enter a maximum island count");
+            showToast(getString(R.string.enter_max_island_count));
         } else if(min < 2) {
-            showToast("Minimum island count must be at least 2");
+            showToast(getString(R.string.min_island_count_must_be_2));
         } else if(max < min) {
-            showToast("Maximum island count cannot be lower than minimum island count");
+            showToast(getString(R.string.max_island_count_cannot_be_below_min));
         } else {
-            Threading.asyncProgressDialog(this, "Generating puzzle",
+            Threading.asyncProgressDialog(this, getString(R.string.generating_puzzle),
                     () -> generate(min, max, seed),
                     preview::setImageBitmap);
         }
@@ -87,13 +87,15 @@ public class RandomPuzzleActivity extends Activity {
         String name = puzzleName.getText().toString();
 
         if(name.isEmpty()) {
-            showToast("Please enter a puzzle name");
+            showToast(getString(R.string.enter_puzzle_name));
         } else if(StorageManager.puzzleExists(this, name)) {
-            showToast("A puzzle with this name already exists");
+            showToast(getString(R.string.puzzle_already_exists));
         } else {
-            Threading.asyncProgressDialog(this, "Saving puzzle",
+            Threading.asyncProgressDialog(this, getString(R.string.saving_puzzle),
                     () -> save(name),
-                    succeeded -> showToast(succeeded ? "Puzzle saved" : "Error while saving puzzle")
+                    succeeded -> showToast(succeeded
+                            ? getString(R.string.puzzle_saved)
+                            : getString(R.string.error_saving_puzzle))
             );
             // TODO: Back to list puzzles activity.
         }
