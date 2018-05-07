@@ -36,7 +36,7 @@ public class PuzzleRenderer {
         TEXT_PAINT.setTextSize(TEXT_SIZE);
         ISLAND_SELECTED_PLACE_PAINT.setColor(Color.BLUE);
         ISLAND_SELECTED_DELETE_PAINT.setColor(Color.RED);
-        ISLAND_ABOVE_DEGREE_PAINT.setColor(Color.rgb(255, 100, 0));
+        ISLAND_ABOVE_DEGREE_PAINT.setColor(Color.YELLOW);
         ISLAND_BELOW_DEGREE_PAINT.setColor(Color.rgb(150, 150, 150));
         ISLAND_ON_DEGREE_PAINT.setColor(Color.GREEN);
     }

@@ -95,6 +95,7 @@ public class RandomPuzzleActivity extends Activity {
                     () -> save(name),
                     succeeded -> showToast(succeeded ? "Puzzle saved" : "Error while saving puzzle")
             );
+            // TODO: Back to list puzzles activity.
         }
     }
 

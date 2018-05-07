@@ -7,20 +7,51 @@ import android.os.AsyncTask;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+/**
+ * Utility methods to create async tasks.
+ */
 public class Threading {
 
+    /**
+     * Executes a new async task.
+     * @param task the task to perform on a background thread
+     * @param onCompletion the task to perform on the main thread once the background task completes
+     */
     public static void async(Action task, Action onCompletion) {
         new VoidTaskWrapper(task, onCompletion).execute();
     }
 
+    /**
+     * Executes a new async task and displays a progress dialog while the task is being executed.
+     * @param context the context to show the dialog in
+     * @param message the message of the dialog
+     * @param task the task to perform on a background thread
+     * @param onCompletion the task to perform on the main thread once the background task completes
+     */
     public static void asyncProgressDialog(Context context, String message, Action task, Action onCompletion) {
         new VoidTaskWrapper(context, message, task, onCompletion).execute();
     }
 
+    /**
+     * Executes a new async task.
+     * @param task the task to perform on a background thread
+     * @param onCompletion the task to perform on the main thread once the background task completes,
+     *                     that consumes the result of the {@code task}
+     * @param <T> the type of the {@code task} result
+     */
     public static <T> void async(Supplier<T> task, Consumer<T> onCompletion) {
         new TaskWrapper<>(task, onCompletion).execute();
     }
 
+    /**
+     * Executes a new async task and displays a progress dialog while the task is being executed.
+     * @param context the context to show the dialog in
+     * @param message the message of the dialog
+     * @param task the task to perform on the background thread
+     * @param onCompletion the task to perform on the main thread once the background task completes,
+     *                     that consumes the result of the {@code task}
+     * @param <T> the type of the {@code task} result
+     */
     public static <T> void asyncProgressDialog(Context context, String message, Supplier<T> task, Consumer<T> onCompletion) {
         new TaskWrapper<>(context, message, task, onCompletion).execute();
     }

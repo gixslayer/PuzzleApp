@@ -23,6 +23,14 @@ public class Functional {
         return condition;
     }
 
+    /**
+     * Applies a function to each element of the cross product of a collection.
+     * @param iterable the collection to take the cross product of
+     * @param function the function that accepts a pair of elements from the cross product
+     * @param <T> the element type of the collection
+     * @param <R> the return type of the {@code function}
+     * @return A stream of the results of each {@code function} invocation
+     */
     public static <T, R> Stream<R> crossApply(Iterable<T> iterable, BiFunction<T, T, R> function) {
         List<R> result = new ArrayList<>();
 
@@ -36,6 +44,11 @@ public class Functional {
         return result.stream();
     }
 
+    /**
+     * Repeats the given {@code action} {@code n} times.
+     * @param n the amount of times to repeat the action
+     * @param action the action to perform
+     */
     public static void repeatN(int n, Action action) {
         for(int i = 0; i < n; ++i) {
             action.perform();
