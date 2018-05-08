@@ -109,11 +109,7 @@ public class RandomPuzzleActivity extends Activity {
         } else {
             Threading.asyncProgressDialog(this, getString(R.string.saving_puzzle),
                     () -> save(name),
-                    succeeded -> showToast(succeeded
-                            ? getString(R.string.puzzle_saved)
-                            : getString(R.string.error_saving_puzzle))
-            );
-            // TODO: Back to list puzzles activity.
+                    this::onSaved);
         }
     }
 
@@ -124,6 +120,19 @@ public class RandomPuzzleActivity extends Activity {
      */
     private boolean save(String name) {
         return StorageManager.save(this, StoredPuzzle.create(name, puzzle, solution, null));
+    }
+
+    /**
+     * Callback method invoked when a puzzle has finished saving.
+     * @param successful indicates whether the saving was successful
+     */
+    private void onSaved(boolean successful) {
+        if(successful) {
+            showToast(getString(R.string.puzzle_saved));
+            finish();
+        } else {
+            showToast(getString(R.string.error_saving_puzzle));
+        }
     }
 
     /**
