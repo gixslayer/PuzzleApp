@@ -98,4 +98,14 @@ public class SolverTest {
 
         System.out.printf("Smart huge solved: %s\n", result.isSolved() ? "yes" : "no");
     }
+
+    @Test
+    public void smartExtreme() {
+        PuzzleSolver solver = new SmartSolver();
+        Puzzle largePuzzle = generatePuzzle(4, 48);
+
+        SolveResult result = solver.solve(largePuzzle);
+
+        System.out.printf("Smart huge solved: %s\n", result.isSolved() ? "yes" : "no");
+    }
 }

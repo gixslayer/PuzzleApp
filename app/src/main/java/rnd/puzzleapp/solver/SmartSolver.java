@@ -1,9 +1,11 @@
 package rnd.puzzleapp.solver;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -15,11 +17,17 @@ import rnd.puzzleapp.puzzle.PuzzleStatus;
 import static rnd.puzzleapp.utils.Collections.iteratorCompare;
 
 public class SmartSolver implements PuzzleSolver {
+    private final Set<Puzzle> searchSpaceSet;
+
+    public SmartSolver() {
+        this.searchSpaceSet = new TreeSet<>((p, t1) -> iteratorCompare(p.getBridges(), t1.getBridges()));
+    }
 
     @Override
     public SolveResult solve(Puzzle puzzle) {
         Puzzle puzzleCopy = puzzle.copy();
         List<Bridge> possibleMoves = puzzleCopy.getPossibleBridges();
+        searchSpaceSet.clear();
 
         if(!placeInitialForcedMoves(puzzleCopy, possibleMoves)) {
             // Unsolvable.
@@ -51,32 +59,29 @@ public class SmartSolver implements PuzzleSolver {
     }
 
     private SolveResult trySolve(Puzzle puzzle, List<Bridge> possibleMoves) {
-        List<Puzzle> searchSpace = new ArrayList<>();
-        Set<Puzzle> searchSpaceSet = new TreeSet<>((p, t1) -> iteratorCompare(p.getBridges(), t1.getBridges()));
+        if(placeAllForcedMoves(puzzle, possibleMoves)) {
+            if (puzzle.getStatus() == PuzzleStatus.Solved) {
+                return new SolveResult(puzzle, true);
+            }
 
-        searchSpace.add(puzzle);
-        int currentIndex = 0;
+            // Sort moves on heuristic that tries to determine the likelihood a move is correct based
+            // on the total number of remaining bridges of both endpoints.
+            List<Bridge> moves = puzzle.getPossibleBridges(possibleMoves);
+            moves.sort(new BridgeComparator(puzzle));
 
-        while(currentIndex < searchSpace.size()) {
-            Puzzle currentPuzzle = searchSpace.get(currentIndex);
-            List<Bridge> currentPossibleMoves = currentPuzzle.getPossibleBridges(possibleMoves);
+            for (Bridge move : moves) {
+                Puzzle newPuzzle = puzzle.fastCopy();
+                newPuzzle.addBridge(move);
 
-            if(placeAllForcedMoves(currentPuzzle, currentPossibleMoves)) {
-                if(currentPuzzle.getStatus() == PuzzleStatus.Solved) {
-                    return new SolveResult(currentPuzzle, true);
-                }
+                if (!searchSpaceSet.contains(newPuzzle)) {
+                    searchSpaceSet.add(newPuzzle);
 
-                for (Bridge move : currentPuzzle.getPossibleBridges(currentPossibleMoves)) {
-                    Puzzle newPuzzle = currentPuzzle.fastCopy();
-                    newPuzzle.addBridge(move);
+                    SolveResult result = trySolve(newPuzzle.fastCopy(), moves);
 
-                    if (!searchSpaceSet.contains(newPuzzle)) {
-                        searchSpace.add(newPuzzle);
-                        searchSpaceSet.add(newPuzzle);
+                    if (result.isSolved()) {
+                        return result;
                     }
                 }
-
-                ++currentIndex;
             }
         }
 
@@ -104,12 +109,16 @@ public class SmartSolver implements PuzzleSolver {
     }
 
     private boolean shouldPlace(Puzzle puzzle, Bridge bridge) {
-        Island island1 = puzzle.getIsland(bridge.getX1(), bridge.getY1()).get();
-        Island island2 = puzzle.getIsland(bridge.getX2(), bridge.getY2()).get();
-
-        return puzzle.getBridgeCount(island1) < island1.getRequiredBridges()
-                && puzzle.getBridgeCount(island2) < island2.getRequiredBridges()
+        return canAcceptBridge(puzzle, bridge.getX1(), bridge.getY1())
+                && canAcceptBridge(puzzle, bridge.getX2(), bridge.getY2())
                 && puzzle.getBridgeCount(bridge) < Puzzle.MAX_BRIDGE_COUNT;
+    }
+
+    private boolean canAcceptBridge(Puzzle puzzle, int x, int y) {
+        Function<Island, Boolean> canAcceptBridge = island ->
+                puzzle.getBridgeCount(island) < island.getRequiredBridges();
+
+        return puzzle.getIsland(x, y).map(canAcceptBridge).orElse(false);
     }
 
     private List<Bridge> getAllCompleteForcedMoves(Puzzle puzzle, List<Bridge> possibleMoves) {
@@ -185,5 +194,30 @@ public class SmartSolver implements PuzzleSolver {
 
     private int getCurrentDegree(Puzzle puzzle, Island island) {
         return (int)puzzle.getBridges().stream().filter(b -> b.hasEndpoint(island)).count();
+    }
+
+    private class BridgeComparator implements Comparator<Bridge> {
+        private final Puzzle puzzle;
+
+        public BridgeComparator(Puzzle puzzle) {
+            this.puzzle = puzzle;
+        }
+
+        private int getRemainingDegree(Island island) {
+            return island.getRequiredBridges() - (int)puzzle.getBridgeCount(island);
+        }
+
+        private int getRemainingDegree(int x, int y) {
+            return puzzle.getIsland(x, y).map(this::getRemainingDegree).orElse(0);
+        }
+
+        private int getRemainingDegree(Bridge bridge) {
+            return getRemainingDegree(bridge.getX1(), bridge.getY1()) + getRemainingDegree(bridge.getX2(), bridge.getY2());
+        }
+
+        @Override
+        public int compare(Bridge bridge, Bridge t1) {
+            return -Integer.compare(getRemainingDegree(bridge), getRemainingDegree(t1));
+        }
     }
 }
