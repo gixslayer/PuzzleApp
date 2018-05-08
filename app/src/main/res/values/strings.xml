@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BruggenMeuk</string>
+    <string name="app_name">BridgeBuilder</string>
     <string name="loading_puzzle">Loading puzzle</string>
     <string name="recreate_all_puzzles">Recreate all puzzles</string>
     <string name="recreate_all_puzzles_message">Are you sure you want to delete and recreate all puzzles? This cannot be undone, and removes all user created puzzles</string>
