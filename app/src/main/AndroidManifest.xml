@@ -18,6 +18,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".RandomPuzzleActivity" />
+        <activity android:name=".HelpActivity"></activity>
     </application>
 
 </manifest>

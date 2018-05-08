@@ -1,5 +1,6 @@
 package rnd.puzzleapp;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -103,6 +104,8 @@ public class PuzzleActivity extends AppCompatActivity {
     }
 
     private void viewHelp() {
-        // TODO: Start game/control info activity/fragment.
+        Intent intent = new Intent(this, HelpActivity.class);
+
+        startActivity(intent);
     }
 }
