@@ -11,6 +11,7 @@ import android.widget.Toast;
 import java.util.Optional;
 
 import rnd.puzzleapp.puzzle.Puzzle;
+import rnd.puzzleapp.puzzle.PuzzleStatus;
 import rnd.puzzleapp.storage.StorageManager;
 import rnd.puzzleapp.storage.StoredPuzzle;
 import rnd.puzzleapp.utils.Dialog;
@@ -56,6 +57,7 @@ public class PuzzleActivity extends AppCompatActivity {
             puzzleController = puzzleView.getPuzzleController();
             puzzleController.setViewOnly(isSolution);
             puzzleController.setOnPuzzleChangedListener(p -> storedPuzzle.markDirty());
+            puzzleController.setOnPuzzleChangedListener(this::onPuzzleChanged);
         }
     }
 
@@ -95,6 +97,15 @@ public class PuzzleActivity extends AppCompatActivity {
 
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void onPuzzleChanged(Puzzle puzzle) {
+        if(puzzle.getStatus() == PuzzleStatus.Solved) {
+            Dialog.showInformationDialog(this,
+                    getString(R.string.puzzle_solved_title),
+                    getString(R.string.puzzle_solved_message),
+                    this::finish);
         }
     }
 

@@ -55,7 +55,7 @@ public class PuzzleView extends View {
         this.puzzleRenderer = new PuzzleRenderer(puzzle);
         this.puzzleController = new PuzzleController(puzzle);
 
-        puzzleController.setOnPuzzleChangedListener(this::onPuzzleChanged);
+        puzzleController.setOnPuzzleChangedListener(p -> invalidate());
         puzzleController.setOnSelectionChangedListener(puzzleRenderer::setSelectedIsland);
         puzzleController.setOnSelectionChangedListener((island, mode) -> invalidate());
     }
@@ -66,14 +66,6 @@ public class PuzzleView extends View {
      */
     public PuzzleController getPuzzleController() {
         return puzzleController;
-    }
-
-    private void onPuzzleChanged(Puzzle puzzle) {
-        invalidate();
-
-        if(puzzle.getStatus() == PuzzleStatus.Solved) {
-            Toast.makeText(getContext(), R.string.puzzle_solved, Toast.LENGTH_SHORT).show();
-        }
     }
 
     @Override

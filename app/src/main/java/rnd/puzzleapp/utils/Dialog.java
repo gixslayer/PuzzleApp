@@ -36,6 +36,35 @@ public class Dialog {
     }
 
     /**
+     * Creates and shows a new information dialog.
+     * @param context the context to show the dialog in
+     * @param title the title of the dialog
+     * @param message the message of the dialog
+     * @param onYes the action to perform if the user clicked the yes button
+     */
+    public static void showInformationDialog(Context context, String title, String message, Action onYes) {
+        showInformationDialog(context, title, message, onYes, () -> {});
+    }
+
+    /**
+     * Creates and shows a new information dialog.
+     * @param context the context to show the dialog in
+     * @param title the title of the dialog
+     * @param message the message of the dialog
+     * @param onYes the action to perform if the user clicked the yes button
+     * @param onNo the action to perform if the user clicked the no button
+     */
+    public static void showInformationDialog(Context context, String title, String message, Action onYes, Action onNo) {
+        new AlertDialog.Builder(context)
+                .setTitle(title)
+                .setMessage(message)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .setPositiveButton(android.R.string.yes, (d, i) -> onYes.perform())
+                .setNegativeButton(android.R.string.no, (d, i) -> onNo.perform())
+                .show();
+    }
+
+    /**
      * Creates and shows a new progress dialog that displays for an indeterminate time. Note that the
      * caller is responsible for calling {@code dismiss} on the returned dialog.
      * @param context the context to show the dialog in

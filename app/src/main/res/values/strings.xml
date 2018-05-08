@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PuzzleApp</string>
+    <string name="app_name">BruggenMeuk</string>
     <string name="loading_puzzle">Loading puzzle</string>
     <string name="recreate_all_puzzles">Recreate all puzzles</string>
     <string name="recreate_all_puzzles_message">Are you sure you want to delete and recreate all puzzles? This cannot be undone, and removes all user created puzzles</string>
@@ -49,4 +49,6 @@
     <string name="building_bridges_content">When an island is tapped it gets an blue color. Now the other island between which you want to build the bridge must be tapped. Cancel the building by tapping the blue island again. It’s only possible to connect island that are horizontally or vertically aligned. It’s not allowed to cross bridges or islands. You can build up to two bridges between two islands. When an island has too few bridges connected to it, it has an gray color. When it has too many bridges connected to it, it has an yellow color. When it has the right amount of bridges it will be green. You can also double up an existing bridge by tapping that bridge.</string>
     <string name="deleting_bridges_header">Deleting bridges</string>
     <string name="deleting_bridges_content">It’s possible to delete bridges by tapping and holding that bridge for some time. When there are two bridges between two island only one gets deleted by tapping and holding the bridges. Another way to delete bridges is by tapping and holding an island. When the island gets a red color you can tap the other island of the bridge you want to delete. Again only one of the two bridges will be deleted when there are two bridges between the island. Cancel the deletion by tapping the red island again.</string>
+    <string name="puzzle_solved_title">Puzzle solved</string>
+    <string name="puzzle_solved_message">Congratulations, you solved the puzzle! Return to the puzzle library?</string>
 </resources>
